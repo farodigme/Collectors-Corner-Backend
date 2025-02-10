@@ -10,6 +10,7 @@ options.UseMySql(
 	builder.Configuration.GetConnectionString("DefaultConnection"),
 	new MySqlServerVersion("8.0.40"))
 );
+builder.Services.AddScoped<ApplicationContext>();
 
 var app = builder.Build();	
 
