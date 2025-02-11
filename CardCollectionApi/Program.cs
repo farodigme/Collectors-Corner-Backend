@@ -5,13 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAntiforgery();
 builder.Services.AddDbContext<ApplicationContext>(options =>
 options.UseMySql(
 	builder.Configuration.GetConnectionString("DefaultConnection"),
 	new MySqlServerVersion("8.0.40"))
 );
-builder.Services.AddScoped<ApplicationContext>();
-
 var app = builder.Build();	
 
 if (app.Environment.IsDevelopment())

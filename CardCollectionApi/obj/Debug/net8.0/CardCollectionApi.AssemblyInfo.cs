@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CardCollectionApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+127d4103e03505512fa2be4da17c872d3be7eacb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6e8687cbc549fe4a21b3f722f9bacccc36da3c63")]
 [assembly: System.Reflection.AssemblyProductAttribute("CardCollectionApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CardCollectionApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

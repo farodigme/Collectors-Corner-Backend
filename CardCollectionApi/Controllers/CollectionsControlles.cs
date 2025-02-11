@@ -1,3 +1,5 @@
+using CardCollectionApi.DataBase;
+using CardCollectionApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CardCollectionApi.Controllers
@@ -6,11 +8,27 @@ namespace CardCollectionApi.Controllers
 	[Route("[controller]")]
 	public class CollectionsControlles : ControllerBase
 	{
-		private readonly ILogger<CollectionsControlles> _logger;
-
-		public CollectionsControlles(ILogger<CollectionsControlles> logger)
+		private ApplicationContext _context;
+		public CollectionsControlles(ApplicationContext context)
 		{
-			_logger = logger;
+			_context = context;
+		}
+
+		[HttpPost("Create")]
+		public async Task<ActionResult> Create([FromBody] Collections collection)
+		{
+			if (collection == null) return BadRequest();
+
+			var newCollection = await _context.AddAsync(collection);
+			await _context.SaveChangesAsync();
+
+			var response = new
+			{
+				Status = "Success",
+				Id = newCollection.Entity.Id
+			};
+
+			return Ok(response);
 		}
 	}
 }
