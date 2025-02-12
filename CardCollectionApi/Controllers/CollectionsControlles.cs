@@ -14,6 +14,15 @@ namespace CardCollectionApi.Controllers
 			_context = context;
 		}
 
+		[HttpGet("GetCollection")]
+		public async Task<IActionResult> GetCollection(int id)
+		{
+			if (id == 0) return BadRequest();
+			var collection = await _context.Collections.FindAsync(id);
+			if (collection == null) return NotFound();
+			return Ok(collection);
+		}
+
 		[HttpPost("Create")]
 		public async Task<ActionResult> Create([FromBody] Collections collection)
 		{
@@ -30,5 +39,6 @@ namespace CardCollectionApi.Controllers
 
 			return Ok(response);
 		}
+
 	}
 }

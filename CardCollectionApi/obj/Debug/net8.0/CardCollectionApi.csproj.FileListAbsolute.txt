@@ -36,3 +36,7 @@ C:\Users\Dan\source\repos\CardCollectionApi\CardCollectionApi\obj\Debug\net8.0\r
 C:\Users\Dan\source\repos\CardCollectionApi\CardCollectionApi\obj\Debug\net8.0\CardCollectionApi.pdb
 C:\Users\Dan\source\repos\CardCollectionApi\CardCollectionApi\obj\Debug\net8.0\CardCollectionApi.genruntimeconfig.cache
 C:\Users\Dan\source\repos\CardCollectionApi\CardCollectionApi\obj\Debug\net8.0\ref\CardCollectionApi.dll
+C:\Users\Dan\source\repos\CardCollectionApi\CardCollectionApi\bin\Debug\net8.0\CardCollectionApi.staticwebassets.endpoints.json
+C:\Users\Dan\source\repos\CardCollectionApi\CardCollectionApi\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Dan\source\repos\CardCollectionApi\CardCollectionApi\obj\Debug\net8.0\staticwebassets\msbuild.CardCollectionApi.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+C:\Users\Dan\source\repos\CardCollectionApi\CardCollectionApi\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -1,0 +1,18 @@
+[
+  {
+    "ContainingType": "CardCollectionApi.Controllers.CollectionsControlles",
+    "Method": "Create",
+    "RelativePath": "CollectionsControlles/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "collection",
+        "Type": "CardCollectionApi.Models.Collections",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
