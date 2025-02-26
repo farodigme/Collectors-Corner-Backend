@@ -1,0 +1,24 @@
+{
+  "Version": 1,
+  "Hash": "AqOxBJ55RC1dJFC3h5Oa//qITeSh/kM4vfVddaN/Vkk=",
+  "Source": "Collectors-Corner.Server",
+  "BasePath": "_content/Collectors-Corner.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "C:\\Users\\Dan\\source\\repos\\Collectors-Corner\\collectors-corner.client\\collectors-corner.client.esproj",
+      "Version": 2,
+      "Source": "collectors-corner.client",
+      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework"
+    }
+  ],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

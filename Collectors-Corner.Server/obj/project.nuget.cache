@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "3o6mwW7YTzg=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Dan\\source\\repos\\Collectors-Corner\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Dan\\.nuget\\packages\\microsoft.aspnetcore.spaproxy\\8.0.13\\microsoft.aspnetcore.spaproxy.8.0.13.nupkg.sha512"
+  ],
+  "logs": []
+}
