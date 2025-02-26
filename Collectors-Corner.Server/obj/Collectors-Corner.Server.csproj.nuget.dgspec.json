@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Dan\\source\\repos\\Collectors-Corner\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj": {}
+    "C:\\Users\\Dan\\source\\repos\\CardCollectionApi\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Dan\\source\\repos\\Collectors-Corner\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj": {
+    "C:\\Users\\Dan\\source\\repos\\CardCollectionApi\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Dan\\source\\repos\\Collectors-Corner\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj",
+        "projectUniqueName": "C:\\Users\\Dan\\source\\repos\\CardCollectionApi\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj",
         "projectName": "Collectors-Corner.Server",
-        "projectPath": "C:\\Users\\Dan\\source\\repos\\Collectors-Corner\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj",
+        "projectPath": "C:\\Users\\Dan\\source\\repos\\CardCollectionApi\\Collectors-Corner.Server\\Collectors-Corner.Server.csproj",
         "packagesPath": "C:\\Users\\Dan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Dan\\source\\repos\\Collectors-Corner\\Collectors-Corner.Server\\obj\\",
+        "outputPath": "C:\\Users\\Dan\\source\\repos\\CardCollectionApi\\Collectors-Corner.Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "E:\\Programs\\SDK\\NuGetPackages"

@@ -3,7 +3,7 @@
 "ServerUrl": "https://localhost:53914",
 "RedirectUrl": "",
 "LaunchCommand": "npm run dev",
-"WorkingDirectory": "C:\\Users\\Dan\\source\\repos\\Collectors-Corner\\Collectors-Corner.Server\\..\\collectors-corner.client",
+"WorkingDirectory": "C:\\Users\\Dan\\source\\repos\\CardCollectionApi\\Collectors-Corner.Server\\..\\collectors-corner.client",
 "MaxTimeoutInSeconds": "120",
 "KeepRunning": "false"
 }
