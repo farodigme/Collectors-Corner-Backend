@@ -1,6 +1,0 @@
-@Collectors_Corner.Server_HostAddress = http://localhost:5204
-
-GET {{Collectors_Corner.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
