@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Collectors_Corner_Backend.Controllers
@@ -11,6 +12,19 @@ namespace Collectors_Corner_Backend.Controllers
 		public AuthController(ILogger<AuthController> logger)
 		{
 			_logger = logger;
+		}
+
+		[HttpGet("HealthCheck")]
+		public IActionResult HealthCheck()
+		{
+			return Ok("Work");
+		}
+
+		[Authorize]
+		[HttpGet("Test")]
+		public IActionResult Test()
+		{
+			return Ok("Test");
 		}
 	}
 }
