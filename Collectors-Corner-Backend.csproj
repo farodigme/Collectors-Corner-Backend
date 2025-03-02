@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Collectors_Corner_Backend</RootNamespace>
+    <UserSecretsId>af189a51-2cc2-46c4-9587-639ae01daf51</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
