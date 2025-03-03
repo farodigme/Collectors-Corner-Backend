@@ -1,5 +1,6 @@
 using Collectors_Corner_Backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Collectors_Corner_Backend
 			var configuration = builder.Configuration;
 
 			builder.Services.Configure<JwtSettings>(configuration.GetRequiredSection("JwtSettings"));
-
+			builder.Services.AddDbContext<ApplicationContext>(options => options.UseMySql());
 			builder.Services.AddControllers();
 			builder.Services.AddAuthorization();
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

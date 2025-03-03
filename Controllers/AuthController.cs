@@ -14,11 +14,13 @@ namespace Collectors_Corner_Backend.Controllers
 	{
 		private readonly ILogger<AuthController> _logger;
 		private readonly JwtSettings _jwtSettings;
+		private ApplicationContext _context;
 
-		public AuthController(ILogger<AuthController> logger, IOptions<JwtSettings> jwtSettings)
+		public AuthController(ILogger<AuthController> logger, IOptions<JwtSettings> jwtSettings, ApplicationContext context)
 		{
 			_logger = logger;
 			_jwtSettings = jwtSettings.Value;
+			_context = context;
 		}
 
 		public string GenerateJwtToken(string username)
@@ -40,6 +42,17 @@ namespace Collectors_Corner_Backend.Controllers
 			if (string.IsNullOrEmpty(username)) return BadRequest("Empty username");
 
 			return Ok(GenerateJwtToken(username));
+		}
+
+		[HttpPost("register")]
+		public async IActionResult Register([FromBody] LoginModel model)
+		{
+			if (!ModelState.IsValid) return BadRequest(ModelState);
+
+			var user = await _context.Users.FindAsync(model);
+			if (user != null) return Ok();
+
+			//register user
 		}
 	}
 }
