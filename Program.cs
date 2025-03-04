@@ -1,4 +1,5 @@
-using Collectors_Corner_Backend.Models;
+using Collectors_Corner_Backend.Models.DataBase;
+using Collectors_Corner_Backend.Models.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,15 +8,15 @@ using System.Text;
 
 namespace Collectors_Corner_Backend
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 			var configuration = builder.Configuration;
 
-			builder.Services.Configure<JwtSettings>(configuration.GetRequiredSection("JwtSettings"));
-			builder.Services.AddDbContext<ApplicationContext>(options => options.UseMySql());
+			builder.Services.Configure<JwtSettings>(configuration.GetRequiredSection(configuration.GetConnectionString("DefaultConnection")));
+			builder.Services.AddDbContext<ApplicationContext>(options => options.UseMySql("", new MySqlServerVersion(new Version(8, 0, 32))));
 			builder.Services.AddControllers();
 			builder.Services.AddAuthorization();
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
