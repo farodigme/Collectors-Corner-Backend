@@ -1,6 +1,7 @@
 using Collectors_Corner_Backend.Models;
 using Collectors_Corner_Backend.Models.DataBase;
 using Collectors_Corner_Backend.Models.Settings;
+using Collectors_Corner_Backend.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -20,28 +21,15 @@ namespace Collectors_Corner_Backend.Controllers
 	[Route("api/[controller]")]
 	public class AuthController : ControllerBase
 	{
-		private readonly JwtSettings _jwtSettings;
+		private readonly JwtService _jwtService;
 		private ApplicationContext _context;
 		private PasswordHasher<string> _passwordHasher;
 
-		public AuthController(IOptions<JwtSettings> jwtSettings, ApplicationContext context)
+		public AuthController(JwtService jwtService, ApplicationContext context)
 		{
-			_jwtSettings = jwtSettings.Value;
+			_jwtService = jwtService;
 			_context = context;
 			_passwordHasher = new PasswordHasher<string>();
-		}
-
-		private string GenerateJwtToken(string email)
-		{
-			var claims = new List<Claim> { new Claim(ClaimTypes.Email, email) };
-			var jwt = new JwtSecurityToken(
-				issuer: _jwtSettings.Issuer,
-				audience: _jwtSettings.Audience,
-				claims: claims,
-				expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
-				signingCredentials: new SigningCredentials(_jwtSettings.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-
-			return new JwtSecurityTokenHandler().WriteToken(jwt);
 		}
 
 		[HttpGet("login")]
@@ -62,7 +50,7 @@ namespace Collectors_Corner_Backend.Controllers
 
 			if (isPasswordEqual == PasswordVerificationResult.Success)
 			{
-				return Ok(GenerateJwtToken(user.Email));
+				return Ok(_jwtService.GenerateJwtToken(user));
 			}
 
 			return Unauthorized("Неверный логин или пароль");
@@ -85,7 +73,7 @@ namespace Collectors_Corner_Backend.Controllers
 			await _context.Users.AddAsync(newUser);
 			await _context.SaveChangesAsync();
 
-			return Ok(GenerateJwtToken(newUser.Email));
+			return Ok(_jwtService.GenerateJwtToken(newUser));
 		}
 
 		[HttpGet("logout")]
