@@ -21,16 +21,6 @@ namespace Collectors_Corner_Backend.Controllers
 	[Route("api/[controller]")]
 	public class AuthController : ControllerBase
 	{
-		private readonly JwtService _jwtService;
-		private ApplicationContext _context;
-		private PasswordHasher<string> _passwordHasher;
-
-		public AuthController(JwtService jwtService, ApplicationContext context)
-		{
-			_jwtService = jwtService;
-			_context = context;
-			_passwordHasher = new PasswordHasher<string>();
-		}
 
 		[HttpGet("login")]
 		public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -74,19 +64,6 @@ namespace Collectors_Corner_Backend.Controllers
 			await _context.SaveChangesAsync();
 
 			return Ok(_jwtService.GenerateJwtToken(newUser));
-		}
-
-		[HttpGet("logout")]
-		public async Task<IActionResult> Logout()
-		{
-			await Response.HttpContext.SignOutAsync(JwtBearerDefaults.AuthenticationScheme);
-			return Ok();
-		}
-
-		[HttpGet]
-		public IActionResult AccessDenied()
-		{
-			return Unauthorized();
 		}
 	}
 }
