@@ -18,7 +18,8 @@ namespace Collectors_Corner_Backend.Services
 			var claims = new List<Claim>
 			{
 				new Claim(ClaimTypes.Name, user.Username),
-				new Claim(ClaimTypes.Email, user.Email)
+				new Claim(ClaimTypes.Email, user.Email),
+				new Claim(ClaimTypes.Role, "User")
 			};
 			var jwt = new JwtSecurityToken(
 			issuer: _jwtSettings.Issuer,

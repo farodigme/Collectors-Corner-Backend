@@ -14,20 +14,9 @@ namespace VivaWebSite.Utils
 			_settings = settings.Value;
 			_logger = logger;
 		}
-		public async Task Send(OrderInfo order)
+		public async Task Send()
 		{
-			string body = "<head><h1>Запрос с сайта.</h1></head>" +
-			"<body>" +
-			"<h2>Обьект заказа:</h2>" + Environment.NewLine +
-			$"<p>Наименование: {order.Title} </p>" + Environment.NewLine +
-			$"<p>OEM: {order.Oem} </p>" + Environment.NewLine +
-			$"<p>Цена: {order.Price} RUB</p>" + Environment.NewLine +
-			$"<p>Имя пользователя: {order.Name}</p>" + Environment.NewLine +
-			$"<p>Фамилия пользователя: {order.Surname}</p>" + Environment.NewLine +
-			$"<p>Email пользователя: {order.Email}</p>" + Environment.NewLine +
-			$"<p>Телефон пользователя: {order.Phone}</p>" + Environment.NewLine +
-			$"<p>Комментарий пользователя: {order.Comment}</p>" + Environment.NewLine +
-			"</body>";
+			string body = "some message";
 			
 			try
 			{
