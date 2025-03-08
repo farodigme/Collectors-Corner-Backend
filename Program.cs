@@ -25,8 +25,8 @@ namespace Collectors_Corner_Backend
 					new MySqlServerVersion(new Version(8, 0, 32))
 					);
 			});
-			builder.Services.AddTransient<UserService>();
-			builder.Services.AddTransient<JwtService>();
+			builder.Services.AddScoped<UserService>();
+			builder.Services.AddSingleton<JwtService>();
 			builder.Services.AddAuthorization();
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>

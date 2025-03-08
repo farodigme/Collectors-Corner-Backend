@@ -1,5 +1,6 @@
 ﻿using Collectors_Corner_Backend.Models.DataBase;
 using Collectors_Corner_Backend.Models.Settings;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -9,9 +10,9 @@ namespace Collectors_Corner_Backend.Services
 	public class JwtService
 	{
 		private readonly JwtSettings _jwtSettings;
-		public JwtService(JwtSettings jwtSettings)
+		public JwtService(IOptions<JwtSettings> jwtSettings)
 		{
-			_jwtSettings = jwtSettings;
+			_jwtSettings = jwtSettings.Value;
 		}
 		public string GenerateJwtToken(User user)
 		{
