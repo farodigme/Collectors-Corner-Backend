@@ -34,7 +34,7 @@ namespace VivaWebSite.Utils
 					{
 						message.IsBodyHtml = true;
 						message.Body = body;
-						message.Subject = "Запрос с сайта";
+						message.Subject = "Верификация";
 						await smtpClient.SendMailAsync(message);
 					}
 				}

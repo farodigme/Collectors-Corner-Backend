@@ -101,8 +101,9 @@ namespace Collectors_Corner_Backend.Services
 				Email = model.Email,
 				Password = _passwordHasher.HashPassword(model.Username, model.Password),
 				AccessToken = _tokenService.GenerateJwtToken(model.Username, model.Email, out DateTime expires),
+				AccessTokenExpires = expires,
 				RefreshToken = _tokenService.GenerateRefreshToken(),
-				AccessTokenExpires = expires
+				RefreshTokenExpires = expires
 			};
 			
 			await _context.Users.AddAsync(newUser);
@@ -112,8 +113,9 @@ namespace Collectors_Corner_Backend.Services
 			{
 				Success = true,
 				AccessToken = newUser.AccessToken,
+				AccessTokenExpires = newUser.AccessTokenExpires,
 				RefreshToken = newUser.RefreshToken,
-				AccessTokenExpires = newUser.AccessTokenExpires
+				RefreshTokenExpires = newUser.RefreshTokenExpires
 			};
 		}
 	}

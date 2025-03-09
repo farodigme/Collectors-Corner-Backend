@@ -10,14 +10,14 @@ namespace Collectors_Corner_Backend.Services
 {
 	public class TokenService
 	{
-		private readonly TokenSettings _jwtSettings;
+		private readonly TokenSettings _tokenSettings;
 		public TokenService(IOptions<TokenSettings> jwtSettings)
 		{
-			_jwtSettings = jwtSettings.Value;
+			_tokenSettings = jwtSettings.Value;
 		}
 		public string GenerateJwtToken(string username, string email, out DateTime expires)
 		{
-			expires = DateTime.Now.AddMinutes(_jwtSettings.TokenLifeTime);
+			expires = DateTime.Now.AddMinutes(_tokenSettings.TokenLifeTime);
 
 			var claims = new List<Claim>
 			{
@@ -26,11 +26,11 @@ namespace Collectors_Corner_Backend.Services
 				new Claim(ClaimTypes.Role, "User")
 			};
 			var jwt = new JwtSecurityToken(
-			issuer: _jwtSettings?.Issuer,
-			audience: _jwtSettings?.Audience,
+			issuer: _tokenSettings?.Issuer,
+			audience: _tokenSettings?.Audience,
 			claims: claims,
 				expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
-				signingCredentials: new SigningCredentials(_jwtSettings.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+				signingCredentials: new SigningCredentials(_tokenSettings.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
 			return new JwtSecurityTokenHandler().WriteToken(jwt);
 		}
