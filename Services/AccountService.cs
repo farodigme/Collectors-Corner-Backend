@@ -7,15 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Collectors_Corner_Backend.Services
 {
-	public class UserService
+	public class AccountService
 	{
-		private readonly JwtService _jwtService;
+		private readonly TokenService _tokenService;
 		private ApplicationContext _context;
 		private PasswordHasher<string> _passwordHasher;
-		public UserService(ApplicationContext context, JwtService jwtService)
+		public AccountService(ApplicationContext context, TokenService jwtService)
 		{
 			_context = context;
-			_jwtService = jwtService;
+			_tokenService = jwtService;
 			_passwordHasher = new PasswordHasher<string>();
 		}
 
@@ -36,7 +36,7 @@ namespace Collectors_Corner_Backend.Services
 				Password = model.Password
 			};
 
-			var user = await _context.Users.FirstAsync(u => u.Username == model.Username);
+			var user = await _context.Users.AsNoTracking().FirstAsync(u => u.Username == model.Username);
 			if (user == null)
 			{
 				return new AuthResponse()
@@ -46,8 +46,8 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			var isPasswordEqual = _passwordHasher.VerifyHashedPassword(user.Email, user.Password, model.Password);
-
+			var isPasswordEqual = _passwordHasher.VerifyHashedPassword(user.Username, user.Password, model.Password);
+			
 			if (isPasswordEqual != PasswordVerificationResult.Success)
 			{
 				return new AuthResponse()
@@ -60,8 +60,9 @@ namespace Collectors_Corner_Backend.Services
 			return new AuthResponse()
 			{
 				Success = true,
-				JWToken = _jwtService.GenerateJwtToken(user),
-				RefreshToken = ""
+				AccessToken = _tokenService.GenerateJwtToken(user.Username, user.Email, out DateTime expires),
+				RefreshToken = _tokenService.GenerateRefreshToken(),
+				AccessTokenExpires = expires
 			};
 		}
 
@@ -76,7 +77,7 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			if (await _context.Users.AnyAsync(u => u.Username == model.Username))
+			if (await _context.Users.AsNoTracking().AnyAsync(u => u.Username == model.Username))
 			{
 				return new AuthResponse()
 				{
@@ -85,7 +86,7 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+			if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == model.Email))
 			{
 				return new AuthResponse()
 				{
@@ -98,17 +99,21 @@ namespace Collectors_Corner_Backend.Services
 			{
 				Username = model.Username,
 				Email = model.Email,
-				Password = _passwordHasher.HashPassword(model.Email, model.Password),
+				Password = _passwordHasher.HashPassword(model.Username, model.Password),
+				AccessToken = _tokenService.GenerateJwtToken(model.Username, model.Email, out DateTime expires),
+				RefreshToken = _tokenService.GenerateRefreshToken(),
+				AccessTokenExpires = expires
 			};
-
+			
 			await _context.Users.AddAsync(newUser);
 			await _context.SaveChangesAsync();
 
 			return new AuthResponse()
 			{
 				Success = true,
-				JWToken = _jwtService.GenerateJwtToken(newUser),
-				RefreshToken = ""
+				AccessToken = newUser.AccessToken,
+				RefreshToken = newUser.RefreshToken,
+				AccessTokenExpires = newUser.AccessTokenExpires
 			};
 		}
 	}

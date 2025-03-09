@@ -4,7 +4,9 @@
 	{
 		public bool Success { get; set; }
 		public string? Error { get; set; }
-		public string JWToken { get; set; }
-		public string RefreshToken { get; set; }
+		public string? AccessToken { get; set; }
+		public DateTime? AccessTokenExpires { get; set; }
+		public string? RefreshToken { get; set; }
+		public DateTime? RefreshTokenExpires { get; set; }
 	}
 }

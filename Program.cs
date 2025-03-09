@@ -17,7 +17,7 @@ namespace Collectors_Corner_Backend
 			var configuration = builder.Configuration;
 
 			builder.Services.AddControllers();
-			builder.Services.Configure<JwtSettings>(configuration.GetRequiredSection("JwtSettings"));
+			builder.Services.Configure<TokenSettings>(configuration.GetRequiredSection("JwtSettings"));
 			builder.Services.AddDbContext<ApplicationContext>(options =>
 			{
 				options.UseMySql(
@@ -25,8 +25,8 @@ namespace Collectors_Corner_Backend
 					new MySqlServerVersion(new Version(8, 0, 32))
 					);
 			});
-			builder.Services.AddScoped<UserService>();
-			builder.Services.AddSingleton<JwtService>();
+			builder.Services.AddScoped<AccountService>();
+			builder.Services.AddSingleton<TokenService>();
 			builder.Services.AddAuthorization();
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>

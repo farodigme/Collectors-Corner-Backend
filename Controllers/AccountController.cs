@@ -10,8 +10,8 @@ namespace Collectors_Corner_Backend.Controllers
 	[Route("api/[controller]")]
 	public class AccountController : ControllerBase
 	{
-		private UserService _userService;
-		public AccountController(UserService userService)
+		private AccountService _userService;
+		public AccountController(AccountService userService)
 		{
 			_userService = userService;
 		}
