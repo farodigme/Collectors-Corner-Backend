@@ -1,18 +1,25 @@
-﻿namespace Collectors_Corner_Backend.Models.DataBase
-{
-    public class User
-    {
-        public int Id { get; set; }
-        public string? Nickname { get; set; }
-        public string? Username { get; set; }
-        public string? Email { get; set; }
-        public string? Password { get; set; }
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+﻿using System.ComponentModel.DataAnnotations;
 
-        public string? AccessToken { get; set; }
-        public DateTime? AccessTokenExpires { get; set; }
-        public string? RefreshToken { get; set; }
-		public DateTime? RefreshTokenExpires { get; set; }
+namespace Collectors_Corner_Backend.Models.Entities
+{
+	public class User
+	{
+		public int Id { get; set; }
+		public string? Nickname { get; set; }
+
+		[Required]
+		[MaxLength(50)]
+		public string Username { get; set; }
+
+		[Required]
+		[EmailAddress]
+		[MaxLength(100)]
+		public string Email { get; set; }
+
+		[Required]
+		public string PasswordHash { get; set; }
+		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+		public RefreshToken? RefreshToken { get; set; }
 
 	}
 }

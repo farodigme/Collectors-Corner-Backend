@@ -1,8 +1,9 @@
-using Collectors_Corner_Backend.Models.DataBase;
+using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Collectors_Corner_Backend.Controllers
 {

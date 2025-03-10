@@ -1,4 +1,4 @@
-﻿using Collectors_Corner_Backend.Models.DataBase;
+﻿using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -10,14 +10,17 @@ namespace Collectors_Corner_Backend.Services
 {
 	public class TokenService
 	{
-		private readonly TokenSettings _tokenSettings;
-		public TokenService(IOptions<TokenSettings> jwtSettings)
+		private readonly JWTokenSettings _tokenSettings;
+		private readonly RefreshTokenSettings _refreshTokenSettings;
+
+		public TokenService(IOptions<JWTokenSettings> jwtSettings, IOptions<RefreshTokenSettings> refreshTokenSettings)
 		{
 			_tokenSettings = jwtSettings.Value;
+			_refreshTokenSettings = refreshTokenSettings.Value;
 		}
 		public string GenerateJwtToken(string username, string email, out DateTime expires)
 		{
-			expires = DateTime.Now.AddMinutes(_tokenSettings.TokenLifeTime);
+			expires = DateTime.Now.AddMinutes(_tokenSettings.TokenLifeTimeMin);
 
 			var claims = new List<Claim>
 			{
@@ -29,18 +32,23 @@ namespace Collectors_Corner_Backend.Services
 			issuer: _tokenSettings?.Issuer,
 			audience: _tokenSettings?.Audience,
 			claims: claims,
-				expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
+				expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(_tokenSettings.TokenLifeTimeMin)),
 				signingCredentials: new SigningCredentials(_tokenSettings.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
 			return new JwtSecurityTokenHandler().WriteToken(jwt);
 		}
 
-		public string GenerateRefreshToken()
+		public RefreshToken GenerateRefreshToken()
 		{
 			var randomNumber = new byte[32];
 			using var rng = RandomNumberGenerator.Create();
 			rng.GetBytes(randomNumber);
-			return Convert.ToHexString(randomNumber);
+			string token = Convert.ToHexString(randomNumber);
+			return new RefreshToken
+			{
+				Token = token,
+				ExpiresAt = DateTime.Now.AddDays(_refreshTokenSettings.TokenLifeTimeDays),
+			};
 		}
 	}
 }

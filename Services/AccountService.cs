@@ -1,4 +1,4 @@
-﻿using Collectors_Corner_Backend.Models.DataBase;
+﻿using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,17 +26,20 @@ namespace Collectors_Corner_Backend.Services
 				return new AuthResponse()
 				{
 					Success = false,
+					Error = "Null data"
+				};
+			}
+
+			if (string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password))
+			{
+				return new AuthResponse()
+				{
+					Success = false,
 					Error = "Empty data"
 				};
 			}
 
-			var loginUser = new User()
-			{
-				Username = model.Username,
-				Password = model.Password
-			};
-
-			var user = await _context.Users.AsNoTracking().FirstAsync(u => u.Username == model.Username);
+			var user = await _context.Users.Include(x => x.RefreshToken).FirstAsync(u => u.Username == model.Username);
 			if (user == null)
 			{
 				return new AuthResponse()
@@ -46,8 +49,8 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			var isPasswordEqual = _passwordHasher.VerifyHashedPassword(user.Username, user.Password, model.Password);
-			
+			var isPasswordEqual = _passwordHasher.VerifyHashedPassword(user.Username, user.PasswordHash, model.Password);
+
 			if (isPasswordEqual != PasswordVerificationResult.Success)
 			{
 				return new AuthResponse()
@@ -57,18 +60,31 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
+			user.RefreshToken = _tokenService.GenerateRefreshToken();
+			await _context.SaveChangesAsync();
+
 			return new AuthResponse()
 			{
 				Success = true,
-				AccessToken = _tokenService.GenerateJwtToken(user.Username, user.Email, out DateTime expires),
-				RefreshToken = _tokenService.GenerateRefreshToken(),
-				AccessTokenExpires = expires
+				AccessToken = _tokenService.GenerateJwtToken(user.Username, user.Email, out DateTime jwTokenExpires),
+				AccessTokenExpires = jwTokenExpires,
+				RefreshToken = user.RefreshToken.Token,
+				RefreshTokenExpires = user.RefreshToken.ExpiresAt
 			};
 		}
 
 		public async Task<AuthResponse> Register([FromBody] RegistrationRequest model)
 		{
 			if (model == null)
+			{
+				return new AuthResponse()
+				{
+					Success = false,
+					Error = "Null data"
+				};
+			}
+
+			if (string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
 			{
 				return new AuthResponse()
 				{
@@ -99,11 +115,8 @@ namespace Collectors_Corner_Backend.Services
 			{
 				Username = model.Username,
 				Email = model.Email,
-				Password = _passwordHasher.HashPassword(model.Username, model.Password),
-				AccessToken = _tokenService.GenerateJwtToken(model.Username, model.Email, out DateTime expires),
-				AccessTokenExpires = expires,
-				RefreshToken = _tokenService.GenerateRefreshToken(),
-				RefreshTokenExpires = expires
+				PasswordHash = _passwordHasher.HashPassword(model.Username, model.Password),
+				RefreshToken = _tokenService.GenerateRefreshToken()
 			};
 			
 			await _context.Users.AddAsync(newUser);
@@ -112,10 +125,38 @@ namespace Collectors_Corner_Backend.Services
 			return new AuthResponse()
 			{
 				Success = true,
-				AccessToken = newUser.AccessToken,
-				AccessTokenExpires = newUser.AccessTokenExpires,
-				RefreshToken = newUser.RefreshToken,
-				RefreshTokenExpires = newUser.RefreshTokenExpires
+				AccessToken = _tokenService.GenerateJwtToken(newUser.Username, newUser.Email, out DateTime jwTokenExpires),
+				AccessTokenExpires = jwTokenExpires,
+				RefreshToken = newUser.RefreshToken.Token,
+				RefreshTokenExpires = newUser.RefreshToken.ExpiresAt
+			};
+		}
+
+		public async Task<AuthResponse> RefreshToken(string requestRefreshToken)
+		{
+			var refreshToken = await _context.RefreshTokens.AsNoTracking().Include(u => u.User).FirstAsync(r => r.Token == requestRefreshToken);
+
+			if (refreshToken == null)
+			{
+				return new AuthResponse()
+				{
+					Success = false,
+					Error = "Refresh token is invalid"
+				};
+			}
+
+			if (refreshToken.IsExpired)
+			{
+				return new AuthResponse()
+				{
+					Success = false,
+					Error = "Refresh token is expired"
+				};
+			}
+
+			return new AuthResponse()
+			{
+				Success = true
 			};
 		}
 	}

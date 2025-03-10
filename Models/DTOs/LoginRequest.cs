@@ -6,9 +6,9 @@ namespace Collectors_Corner_Backend.Models.DTOs
 	{
 		[Required]
 		[MaxLength(50)]
-		public string Username { get; set; }
+		public string? Username { get; set; }
 
 		[Required]
-		public string Password { get; set; }
+		public string? Password { get; set; }
 	}
 }

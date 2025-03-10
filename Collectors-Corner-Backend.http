@@ -1,8 +1,7 @@
 @baseUrl = http://localhost:5031
-@token  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJ1c2VyMUBlbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNzQxNDYyMzkxLCJpc3MiOiJNeUF1dGhTZXJ2ZXIiLCJhdWQiOiJNeUFQSSJ9.e7AxdtE6QwptTEbeTEQBDcI5GwUdrJkEKFjj7isfnu8"
+@token  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJ1c2VyMUBlbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNzQxNjQzODcyLCJpc3MiOiJNeUF1dGhTZXJ2ZXIiLCJhdWQiOiJNeUFQSSJ9.AgCn9zDMtKZPZ7YcoKZ_bNtYWahvVd1pkOUOxwGKvDo"
 
 GET {{baseUrl}}/api/account/login
-Authorization: Bearer {{token}}
 Content-Type: application/json
 {
     "username": "user1",
@@ -17,3 +16,12 @@ Content-Type: application/json
     "email": "user1@email.com",
     "password": "password123"
 }
+###
+
+POST {{baseUrl}}/api/account/test
+Authorization: Bearer {{token}}
+Content-Type: application/json
+{
+
+}
+###
