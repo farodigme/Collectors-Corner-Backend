@@ -32,5 +32,13 @@ namespace Collectors_Corner_Backend.Controllers
 			if (!result.Success) return BadRequest(result);
 			return Ok(result);
 		}
+
+		[HttpPost("refresh")]
+		public async Task<IActionResult> Register([FromBody] RefreshTokenRequest model)
+		{
+			var result = await _userService.RefreshToken(model);
+			if (!result.Success) return BadRequest(result);
+			return Ok(result);
+		}
 	}
 }

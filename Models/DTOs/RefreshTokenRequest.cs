@@ -2,13 +2,12 @@
 
 namespace Collectors_Corner_Backend.Models.DTOs
 {
-	public class LoginRequest
+	public class RefreshTokenRequest
 	{
 		[Required]
-		[MaxLength(50)]
-		public string Username { get; set; }
+		public string AccessToken { get; set; }
 
 		[Required]
-		public string Password { get; set; }
+		public string RefreshToken { get; set; }
 	}
 }

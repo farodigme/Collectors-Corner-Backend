@@ -2,13 +2,12 @@
 
 namespace Collectors_Corner_Backend.Models.DTOs
 {
-	public class LoginRequest
+	public class JWToken
 	{
 		[Required]
-		[MaxLength(50)]
-		public string Username { get; set; }
+		public string Token { get; set; }
 
 		[Required]
-		public string Password { get; set; }
+		public DateTime ExpiresAt { get; set; }
 	}
 }
