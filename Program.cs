@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Collectors_Corner_Backend
 {
-    public class Program
+	public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -26,17 +26,20 @@ namespace Collectors_Corner_Backend
 			var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 			builder.Services.Configure<RefreshTokenSettings>(configuration.GetRequiredSection("RefreshTokenSettings"));
-			
+
 			builder.Services.AddScoped<AccountService>();
 			builder.Services.AddSingleton<TokenService>();
-			builder.Services.AddAuthorization();
 
-			
-			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-				.AddJwtBearer(options =>
-				{
-					options.TokenValidationParameters = jwtSettings.GetTokenValidationParameters();
-				});
+			builder.Services.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			}).AddJwtBearer(options =>
+			  {
+				  options.TokenValidationParameters = jwtSettings.GetTokenValidationParameters();
+			  });
+
+			builder.Services.AddAuthorization();
 
 			var app = builder.Build();
 

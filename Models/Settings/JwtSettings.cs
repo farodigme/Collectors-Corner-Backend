@@ -23,7 +23,8 @@ namespace Collectors_Corner_Backend.Models.Settings
 				ValidAudience = Audience,
 				ValidateLifetime = true,
 				IssuerSigningKey = GetSymmetricSecurityKey(),
-				ValidateIssuerSigningKey = true
+				ValidateIssuerSigningKey = true,
+				ClockSkew = TimeSpan.Zero
 			};
 		}
 	}

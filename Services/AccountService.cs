@@ -94,7 +94,7 @@ namespace Collectors_Corner_Backend.Services
 			await _context.SaveChangesAsync();
 
 			var newAccessToken = _tokenService.GenerateJwtToken(newUser);
-			
+
 			return new AuthResponse()
 			{
 				Success = true,
@@ -109,31 +109,48 @@ namespace Collectors_Corner_Backend.Services
 		{
 			string accessToken = request.AccessToken;
 			string refreshToken = request.RefreshToken;
-			
+
 			var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
 			var username = principal.Identity.Name;
 
-			var user = _context.Users.SingleOrDefault(u => u.Username == username);
+			var user = _context.Users.Include(t => t.RefreshToken).FirstOrDefault(u => u.Username == username);
 
-			if (user is null || user.RefreshToken.Token != refreshToken || user.RefreshToken.ExpiresAt <= DateTime.UtcNow)
+			if (user == null)
+			{
 				return new AuthResponse
 				{
 					Success = false,
-					Error = "Invalid client request"
+					Error = "Invalid access token"
 				};
+			}
+
+			if (user.RefreshToken.Token != refreshToken)
+			{
+				return new AuthResponse
+				{
+					Success = false,
+					Error = "Invalid refresh token"
+				};
+			}
+
+			if (user.RefreshToken.ExpiresAt <= DateTime.UtcNow)
+			{
+				return new AuthResponse
+				{
+					Success = false,
+					Error = "Refresh token expired"
+				};
+			}
 
 			var newAccessToken = _tokenService.GenerateJwtToken(user);
-			var newRefreshToken = _tokenService.GenerateRefreshToken();
-			
-			user.RefreshToken = newRefreshToken;
-			await _context.SaveChangesAsync();
 
 			return new AuthResponse
 			{
+				Success = true,
 				AccessToken = newAccessToken.Token,
 				AccessTokenExpires = newAccessToken.ExpiresAt,
-				RefreshToken = newRefreshToken.Token,
-				RefreshTokenExpires = newRefreshToken.ExpiresAt
+				RefreshToken = user.RefreshToken.Token,
+				RefreshTokenExpires = user.RefreshToken.ExpiresAt
 			};
 		}
 	}

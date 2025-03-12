@@ -17,9 +17,12 @@ namespace Collectors_Corner_Backend.Models.Entities
 		public string Email { get; set; }
 
 		[Required]
+		[MaxLength(50)]
 		public string PasswordHash { get; set; }
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-		public RefreshToken? RefreshToken { get; set; }
+		
+		[Required]
+		public RefreshToken RefreshToken { get; set; }
 
 	}
 }

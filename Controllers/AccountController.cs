@@ -17,7 +17,7 @@ namespace Collectors_Corner_Backend.Controllers
 			_userService = userService;
 		}
 
-		[HttpGet("login")]
+		[HttpPost("login")]
 		public async Task<IActionResult> Login([FromBody] LoginRequest model)
 		{
 			var result = await _userService.Login(model);

@@ -29,12 +29,13 @@ namespace Collectors_Corner_Backend.Services
 				new Claim(ClaimTypes.Name, user.Username),
 				new Claim(ClaimTypes.Email, user.Email)
 			};
+
 			var jwt = new JwtSecurityToken(
 			issuer: _jwtSettings.Issuer,
 			audience: _jwtSettings.Audience,
 			claims: claims,
-				expires: tokenExpires,
-				signingCredentials: new SigningCredentials(_jwtSettings.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+			expires: tokenExpires,
+			signingCredentials: new SigningCredentials(_jwtSettings.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
 			return new JWToken
 			{
@@ -46,16 +47,16 @@ namespace Collectors_Corner_Backend.Services
 		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
 		{
 			var tokenValidationParameters = _jwtSettings.GetTokenValidationParameters();
-			
+
 			var tokenHandler = new JwtSecurityTokenHandler();
 			SecurityToken securityToken;
 
 			var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
 			var jwtSecurityToken = securityToken as JwtSecurityToken;
-			
+
 			if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
 				throw new SecurityTokenException("Invalid token");
-			
+
 			return principal;
 		}
 
@@ -65,6 +66,7 @@ namespace Collectors_Corner_Backend.Services
 			using var rng = RandomNumberGenerator.Create();
 			rng.GetBytes(randomNumber);
 			string token = Convert.ToHexString(randomNumber);
+
 			return new RefreshToken
 			{
 				Token = token,
