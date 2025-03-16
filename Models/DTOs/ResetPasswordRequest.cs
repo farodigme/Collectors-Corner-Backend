@@ -2,12 +2,10 @@
 
 namespace Collectors_Corner_Backend.Models.DTOs
 {
-	public class JWToken
+	public class ResetPasswordRequest
 	{
 		[Required]
-		public string Token { get; set; }
-
-		[Required]
-		public DateTime ExpiresAt { get; set; }
+		[EmailAddress]
+		public string Email { get; set; }
 	}
 }

@@ -9,12 +9,12 @@ using System.Diagnostics;
 
 namespace Collectors_Corner_Backend.Services
 {
-	public class AccountService
+	public class AuthService
 	{
 		private readonly TokenService _tokenService;
 		private ApplicationContext _context;
 		private PasswordHasher<string> _passwordHasher;
-		public AccountService(ApplicationContext context, TokenService jwtService)
+		public AuthService(ApplicationContext context, TokenService jwtService)
 		{
 			_context = context;
 			_tokenService = jwtService;
@@ -60,9 +60,9 @@ namespace Collectors_Corner_Backend.Services
 			};
 		}
 
-		public async Task<AuthResponse> Register(RegistrationRequest model)
+		public async Task<AuthResponse> Register(RegistrationRequest request)
 		{
-			if (await _context.Users.AsNoTracking().AnyAsync(u => u.Username == model.Username))
+			if (await _context.Users.AsNoTracking().AnyAsync(u => u.Username == request.Username))
 			{
 				return new AuthResponse()
 				{
@@ -71,7 +71,7 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == model.Email))
+			if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == request.Email))
 			{
 				return new AuthResponse()
 				{
@@ -84,9 +84,9 @@ namespace Collectors_Corner_Backend.Services
 
 			var newUser = new User()
 			{
-				Username = model.Username,
-				Email = model.Email,
-				PasswordHash = _passwordHasher.HashPassword(model.Username, model.Password),
+				Username = request.Username,
+				Email = request.Email,
+				PasswordHash = _passwordHasher.HashPassword(request.Username, request.Password),
 				RefreshToken = newRefreshToken
 			};
 
@@ -113,7 +113,7 @@ namespace Collectors_Corner_Backend.Services
 			var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
 			var username = principal.Identity.Name;
 
-			var user = _context.Users.Include(t => t.RefreshToken).FirstOrDefault(u => u.Username == username);
+			var user = await _context.Users.Include(t => t.RefreshToken).FirstOrDefaultAsync(u => u.Username == username);
 
 			if (user == null)
 			{
@@ -152,6 +152,14 @@ namespace Collectors_Corner_Backend.Services
 				RefreshToken = user.RefreshToken.Token,
 				RefreshTokenExpires = user.RefreshToken.ExpiresAt
 			};
+		}
+
+		public async Task<AuthResponse> ResetPassword(ResetPasswordRequest request)
+		{
+			if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+			{
+				throw new InvalidOperationException();
+			}
 		}
 	}
 }

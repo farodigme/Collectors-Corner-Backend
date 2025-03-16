@@ -27,7 +27,7 @@ namespace Collectors_Corner_Backend
 
 			builder.Services.Configure<RefreshTokenSettings>(configuration.GetRequiredSection("RefreshTokenSettings"));
 
-			builder.Services.AddScoped<AccountService>();
+			builder.Services.AddScoped<AuthService>();
 			builder.Services.AddSingleton<TokenService>();
 
 			builder.Services.AddAuthentication(options =>

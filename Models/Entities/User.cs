@@ -5,6 +5,8 @@ namespace Collectors_Corner_Backend.Models.Entities
 	public class User
 	{
 		public int Id { get; set; }
+
+		[MaxLength(50)]
 		public string? Nickname { get; set; }
 
 		[Required]

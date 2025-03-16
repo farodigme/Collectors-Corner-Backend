@@ -1,4 +1,4 @@
-﻿using Collectors_Corner_Backend.Models.DTOs;
+﻿using Collectors_Corner_Backend.Models;
 using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.Settings;
 using Microsoft.Extensions.Options;
