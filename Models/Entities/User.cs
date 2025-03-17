@@ -6,25 +6,28 @@ namespace Collectors_Corner_Backend.Models.Entities
 	{
 		public int Id { get; set; }
 
-		[MaxLength(50)]
+		[MaxLength(16)]
 		public string? Nickname { get; set; }
 
 		[Required]
-		[MaxLength(50)]
+		[MaxLength(16)]
 		public string Username { get; set; }
 
 		[Required]
 		[EmailAddress]
-		[MaxLength(100)]
+		[MaxLength(32)]
 		public string Email { get; set; }
 
 		[Required]
-		[MaxLength(50)]
+		[MaxLength(512)]
 		public string PasswordHash { get; set; }
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 		
 		[Required]
+		[MaxLength(64)]
 		public RefreshToken RefreshToken { get; set; }
 
+		[MaxLength(64)]
+		public ResetToken? ResetToken { get; set; }
 	}
 }

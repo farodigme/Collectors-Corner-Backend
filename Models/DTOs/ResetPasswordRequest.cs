@@ -5,7 +5,14 @@ namespace Collectors_Corner_Backend.Models.DTOs
 	public class ResetPasswordRequest
 	{
 		[Required]
-		[EmailAddress]
-		public string Email { get; set; }
+		public string Token { get; set; }
+
+		[Required]
+		[MaxLength(16)]
+		public string NewPassword { get; set; }
+
+		[Required]
+		[MaxLength(16)]
+		public string ConfirmPassword { get; set; }
 	}
 }

@@ -26,6 +26,7 @@ namespace Collectors_Corner_Backend
 			var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 			builder.Services.Configure<RefreshTokenSettings>(configuration.GetRequiredSection("RefreshTokenSettings"));
+			builder.Services.Configure<ResetTokenSettings>(configuration.GetRequiredSection("ResetTokenSettings"));
 
 			builder.Services.AddScoped<AuthService>();
 			builder.Services.AddSingleton<TokenService>();

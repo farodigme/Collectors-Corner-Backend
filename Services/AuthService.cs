@@ -1,11 +1,7 @@
 ﻿using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.DTOs;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using System.Diagnostics;
 
 namespace Collectors_Corner_Backend.Services
 {
@@ -14,10 +10,15 @@ namespace Collectors_Corner_Backend.Services
 		private readonly TokenService _tokenService;
 		private ApplicationContext _context;
 		private PasswordHasher<string> _passwordHasher;
-		public AuthService(ApplicationContext context, TokenService jwtService)
+		private EmailService _emailService;
+		public AuthService(
+			ApplicationContext context,
+			TokenService jwtService,
+			EmailService emailService)
 		{
 			_context = context;
 			_tokenService = jwtService;
+			_emailService = emailService;
 			_passwordHasher = new PasswordHasher<string>();
 		}
 
@@ -133,7 +134,7 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			if (user.RefreshToken.ExpiresAt <= DateTime.UtcNow)
+			if (user.RefreshToken.IsExpired)
 			{
 				return new AuthResponse
 				{
@@ -154,12 +155,32 @@ namespace Collectors_Corner_Backend.Services
 			};
 		}
 
+		public async Task<AuthResponse> ForgotPassword(ForgotPasswordRequest request)
+		{
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+			if (user == null)
+			{
+				return new AuthResponse()
+				{
+					Success = false,
+					Error = "Invalid Email"
+				};
+			}
+
+			user.ResetToken = _tokenService.GenerateResetToken();
+			await _context.SaveChangesAsync();
+
+			await _emailService.SendAsync(user.Email, "For reset password follow link: ....");
+
+			return new AuthResponse
+			{
+				Success = true
+			};
+		}
+
 		public async Task<AuthResponse> ResetPassword(ResetPasswordRequest request)
 		{
-			if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-			{
-				throw new InvalidOperationException();
-			}
+			throw new NotImplementedException();
 		}
 	}
 }

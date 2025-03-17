@@ -1,23 +1,21 @@
 ﻿using System.Net.Mail;
 using System.Net;
 using Microsoft.Extensions.Options;
-using VivaWebSite.Models;
+using Collectors_Corner_Backend.Models;
 
-namespace VivaWebSite.Utils
+namespace Collectors_Corner_Backend.Services
 {
-	public class GmailService
+	public class EmailService
 	{
-		private readonly GmailSettings _settings;
-		private readonly ILogger<GmailService> _logger;
-		public GmailService(IOptions<GmailSettings> settings, ILogger<GmailService> logger)
+		private readonly EmailSettings _settings;
+		private readonly ILogger<EmailService> _logger;
+		public EmailService(IOptions<EmailSettings> settings, ILogger<EmailService> logger)
 		{
 			_settings = settings.Value;
 			_logger = logger;
 		}
-		public async Task Send()
+		public async Task SendAsync(string email, string body)
 		{
-			string body = "some message";
-			
 			try
 			{
 				using (var smtpClient = new SmtpClient(_settings.SmtpServer, _settings.Port))
@@ -30,18 +28,17 @@ namespace VivaWebSite.Utils
 					};
 					smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
 					smtpClient.EnableSsl = true;
-					using (var message = new MailMessage(_settings.User, _settings.User))
+					using (var message = new MailMessage(_settings.User, email))
 					{
 						message.IsBodyHtml = true;
 						message.Body = body;
-						message.Subject = "Верификация";
 						await smtpClient.SendMailAsync(message);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError("Ошибка отправки запроса Gmail: " + ex);
+				_logger.LogError("Error sending message: " + ex);
 			}
 		}
 	}

@@ -5,10 +5,11 @@ namespace Collectors_Corner_Backend.Models.DTOs
 	public class LoginRequest
 	{
 		[Required]
-		[MaxLength(50)]
+		[MaxLength(16)]
 		public string Username { get; set; }
 
 		[Required]
+		[MaxLength(24)]
 		public string Password { get; set; }
 	}
 }

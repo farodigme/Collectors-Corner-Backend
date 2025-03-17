@@ -14,12 +14,18 @@ namespace Collectors_Corner_Backend.Services
 	{
 		private readonly JwtSettings _jwtSettings;
 		private readonly RefreshTokenSettings _refreshTokenSettings;
+		private readonly ResetTokenSettings _resetTokenSettings;
 
-		public TokenService(IOptions<JwtSettings> jwtSettings, IOptions<RefreshTokenSettings> refreshTokenSettings)
+		public TokenService(
+			IOptions<JwtSettings> jwtSettings,
+			IOptions<RefreshTokenSettings> refreshTokenSettings,
+			IOptions<ResetTokenSettings> resetTokenSettings)
 		{
 			_jwtSettings = jwtSettings.Value;
 			_refreshTokenSettings = refreshTokenSettings.Value;
+			_resetTokenSettings = resetTokenSettings.Value;
 		}
+
 		public JWToken GenerateJwtToken(User user)
 		{
 			var tokenExpires = DateTime.Now.AddMinutes(_jwtSettings.TokenLifeTimeMin);
@@ -60,17 +66,29 @@ namespace Collectors_Corner_Backend.Services
 			return principal;
 		}
 
-		public RefreshToken GenerateRefreshToken()
+		private string GenerateRandomToken()
 		{
 			var randomNumber = new byte[32];
 			using var rng = RandomNumberGenerator.Create();
 			rng.GetBytes(randomNumber);
-			string token = Convert.ToHexString(randomNumber);
+			return Convert.ToHexString(randomNumber);
+		}
 
+		public RefreshToken GenerateRefreshToken()
+		{
 			return new RefreshToken
 			{
-				Token = token,
+				Token = GenerateRandomToken(),
 				ExpiresAt = DateTime.Now.AddDays(_refreshTokenSettings.TokenLifeTimeDays),
+			};
+		}
+
+		public ResetToken GenerateResetToken()
+		{
+			return new ResetToken
+			{
+				Token = GenerateRandomToken(),
+				ExpiresAt = DateTime.Now.AddDays(_resetTokenSettings.TokenLifeTimeMin),
 			};
 		}
 	}

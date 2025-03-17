@@ -4,6 +4,7 @@ using Collectors_Corner_Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Collectors_Corner_Backend.Controllers
 {
@@ -38,10 +39,11 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
-		[HttpPost("reset")]
-		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+		[HttpPost("forgot-password")]
+		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
 		{
-			throw new NotImplementedException();
+			var result = await _userService.ForgotPassword(request);
+			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}
 }
