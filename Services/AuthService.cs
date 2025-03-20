@@ -175,7 +175,7 @@ namespace Collectors_Corner_Backend.Services
 			user.ResetToken = _tokenService.GenerateResetToken();
 			await _context.SaveChangesAsync();
 
-			await _emailService.SendAsync(user.Email, "Reset password", $"For reset password follow link: {_frontendSettings.BaseUrl}/reset-password/{user.ResetToken}");
+			await _emailService.SendAsync(user.Email, "Reset password", $"For reset password follow link: {_frontendSettings.BaseUrl}/reset-password/{user.ResetToken.Token}");
 
 			return new AuthResponse
 			{
@@ -185,7 +185,32 @@ namespace Collectors_Corner_Backend.Services
 
 		public async Task<AuthResponse> ResetPassword(ResetPasswordRequest request)
 		{
-			throw new NotImplementedException();
+			var user = await _context.Users.Include(r => r.ResetToken).FirstOrDefaultAsync(u => u.ResetToken.Token == request.ResetToken);
+			if (user == null)
+			{
+				return new AuthResponse()
+				{
+					Success = false,
+					Error = "Invalid reset token"
+				};
+			}
+
+			if (request.NewPassword != request.ConfirmPassword)
+			{
+				return new AuthResponse()
+				{
+					Success = false,
+					Error = "Passwords are not equal"
+				};
+			}
+
+			user.PasswordHash = _passwordHasher.HashPassword(user.Username, request.NewPassword);
+			await _context.SaveChangesAsync();
+
+			return new AuthResponse()
+			{
+				Success = true
+			};
 		}
 	}
 }

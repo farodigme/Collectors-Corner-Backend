@@ -46,5 +46,11 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
+		[HttpPost("reset-password")]
+		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+		{
+			var result = await _userService.ResetPassword(request);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
 	}
 }
