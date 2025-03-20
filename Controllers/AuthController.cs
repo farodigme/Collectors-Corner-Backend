@@ -1,10 +1,10 @@
 using Collectors_Corner_Backend.Models.Entities;
-using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Collectors_Corner_Backend.Models.DTOs.Auth;
 
 namespace Collectors_Corner_Backend.Controllers
 {

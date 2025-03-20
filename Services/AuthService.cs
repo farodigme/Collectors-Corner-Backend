@@ -1,8 +1,8 @@
 ﻿using Collectors_Corner_Backend.Models.Entities;
-using Collectors_Corner_Backend.Models.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Collectors_Corner_Backend.Models.Settings;
+using Collectors_Corner_Backend.Models.DTOs.Auth;
 
 namespace Collectors_Corner_Backend.Services
 {
