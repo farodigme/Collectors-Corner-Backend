@@ -45,5 +45,6 @@ namespace Collectors_Corner_Backend.Controllers
 			var result = await _userService.ForgotPassword(request);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
+
 	}
 }

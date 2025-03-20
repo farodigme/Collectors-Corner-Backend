@@ -2,6 +2,7 @@
 using Collectors_Corner_Backend.Models.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Collectors_Corner_Backend.Models.Settings;
 
 namespace Collectors_Corner_Backend.Services
 {
@@ -11,14 +12,18 @@ namespace Collectors_Corner_Backend.Services
 		private ApplicationContext _context;
 		private PasswordHasher<string> _passwordHasher;
 		private EmailService _emailService;
+		private FrontendSettings _frontendSettings;
+
 		public AuthService(
 			ApplicationContext context,
 			TokenService jwtService,
-			EmailService emailService)
+			EmailService emailService,
+			FrontendSettings frontendSettings)
 		{
 			_context = context;
 			_tokenService = jwtService;
 			_emailService = emailService;
+			_frontendSettings = frontendSettings;
 			_passwordHasher = new PasswordHasher<string>();
 		}
 
@@ -170,7 +175,7 @@ namespace Collectors_Corner_Backend.Services
 			user.ResetToken = _tokenService.GenerateResetToken();
 			await _context.SaveChangesAsync();
 
-			await _emailService.SendAsync(user.Email, "For reset password follow link: ....");
+			await _emailService.SendAsync(user.Email, "Reset password", $"For reset password follow link: {_frontendSettings.BaseUrl}/reset-password/{user.ResetToken}");
 
 			return new AuthResponse
 			{

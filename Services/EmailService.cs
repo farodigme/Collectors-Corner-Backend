@@ -14,7 +14,7 @@ namespace Collectors_Corner_Backend.Services
 			_settings = settings.Value;
 			_logger = logger;
 		}
-		public async Task SendAsync(string email, string body)
+		public async Task SendAsync(string email, string subject, string body)
 		{
 			try
 			{
@@ -31,6 +31,7 @@ namespace Collectors_Corner_Backend.Services
 					using (var message = new MailMessage(_settings.User, email))
 					{
 						message.IsBodyHtml = true;
+						message.Subject = subject;
 						message.Body = body;
 						await smtpClient.SendMailAsync(message);
 					}
