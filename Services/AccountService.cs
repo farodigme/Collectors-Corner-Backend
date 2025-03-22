@@ -1,6 +1,7 @@
 ﻿using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Models.DTOs.Auth;
 using Collectors_Corner_Backend.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Collectors_Corner_Backend.Services
 {
@@ -15,7 +16,7 @@ namespace Collectors_Corner_Backend.Services
 
 		public async Task<BaseResponse> UpdateNicknameAsync(string username, string nickname)
 		{
-			var user = await _context.Users.FindAsync(username);
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
 			if (user == null)
 			{
 				return new BaseResponse()
