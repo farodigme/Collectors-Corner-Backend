@@ -15,15 +15,18 @@ namespace Collectors_Corner_Backend.Services
 		private readonly JwtSettings _jwtSettings;
 		private readonly RefreshTokenSettings _refreshTokenSettings;
 		private readonly ResetTokenSettings _resetTokenSettings;
+		private readonly ILogger<EmailService> _logger;
 
 		public TokenService(
 			IOptions<JwtSettings> jwtSettings,
 			IOptions<RefreshTokenSettings> refreshTokenSettings,
-			IOptions<ResetTokenSettings> resetTokenSettings)
+			IOptions<ResetTokenSettings> resetTokenSettings,
+			ILogger<EmailService> logger)
 		{
 			_jwtSettings = jwtSettings.Value;
 			_refreshTokenSettings = refreshTokenSettings.Value;
 			_resetTokenSettings = resetTokenSettings.Value;
+			_logger = logger;
 		}
 
 		public JWToken GenerateJwtToken(User user)
@@ -50,21 +53,37 @@ namespace Collectors_Corner_Backend.Services
 			};
 		}
 
-		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+		public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
 		{
-			var tokenValidationParameters = _jwtSettings.GetTokenValidationParameters();
+			try
+			{
+				var tokenValidationParameters = _jwtSettings.GetTokenValidationParameters();
+				var tokenHandler = new JwtSecurityTokenHandler();
 
-			var tokenHandler = new JwtSecurityTokenHandler();
-			SecurityToken securityToken;
+				var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
 
-			var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-			var jwtSecurityToken = securityToken as JwtSecurityToken;
+				if (principal.Claims == null || principal.Identities == null)
+					return null;
 
-			if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
-				throw new SecurityTokenException("Invalid token");
+				var jwtSecurityToken = securityToken as JwtSecurityToken;
 
-			return principal;
+				if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+					return null;
+
+				return principal;
+			}
+			catch (SecurityTokenException ex)
+			{
+				_logger.LogError("Validation token exeption: " + ex);
+				return null;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError("Error: " + ex);
+				return null;
+			}
 		}
+
 
 		private string GenerateRandomToken()
 		{

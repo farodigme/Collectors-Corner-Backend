@@ -8,5 +8,7 @@ namespace Collectors_Corner_Backend.Models.Entities
 
         public DbSet<User> Users { get; set; }
 		public DbSet<RefreshToken> RefreshTokens { get; set; }
+		public DbSet<ResetToken> ResetTokens { get; set; }
+
 	}
 }

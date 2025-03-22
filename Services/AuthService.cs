@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Collectors_Corner_Backend.Models.Settings;
 using Collectors_Corner_Backend.Models.DTOs.Auth;
+using Microsoft.Extensions.Options;
+using Collectors_Corner_Backend.Models.DTOs;
 
 namespace Collectors_Corner_Backend.Services
 {
@@ -14,22 +16,23 @@ namespace Collectors_Corner_Backend.Services
 		private EmailService _emailService;
 		private FrontendSettings _frontendSettings;
 
+
 		public AuthService(
 			ApplicationContext context,
 			TokenService jwtService,
 			EmailService emailService,
-			FrontendSettings frontendSettings)
+			IOptions<FrontendSettings> frontendSettings)
 		{
 			_context = context;
 			_tokenService = jwtService;
 			_emailService = emailService;
-			_frontendSettings = frontendSettings;
+			_frontendSettings = frontendSettings.Value;
 			_passwordHasher = new PasswordHasher<string>();
 		}
 
 		public async Task<AuthResponse> Login(LoginRequest model)
 		{
-			var user = await _context.Users.Include(x => x.RefreshToken).FirstAsync(u => u.Username == model.Username);
+			var user = await _context.Users.Include(x => x.RefreshToken).FirstOrDefaultAsync(u => u.Username == model.Username);
 			if (user == null)
 			{
 				return new AuthResponse()
@@ -117,8 +120,16 @@ namespace Collectors_Corner_Backend.Services
 			string refreshToken = request.RefreshToken;
 
 			var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
-			var username = principal.Identity.Name;
+			if (principal == null)
+			{
+				return new AuthResponse
+				{
+					Success = false,
+					Error = "Invalid access token"
+				};
+			}
 
+			var username = principal.Identity.Name;
 			var user = await _context.Users.Include(t => t.RefreshToken).FirstOrDefaultAsync(u => u.Username == username);
 
 			if (user == null)
@@ -160,12 +171,12 @@ namespace Collectors_Corner_Backend.Services
 			};
 		}
 
-		public async Task<AuthResponse> ForgotPassword(ForgotPasswordRequest request)
+		public async Task<BaseResponse> ForgotPassword(ForgotPasswordRequest request)
 		{
-			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+			var user = await _context.Users.Include(r => r.ResetToken).FirstOrDefaultAsync(u => u.Email == request.Email);
 			if (user == null)
 			{
-				return new AuthResponse()
+				return new BaseResponse()
 				{
 					Success = false,
 					Error = "Invalid Email"
@@ -177,18 +188,18 @@ namespace Collectors_Corner_Backend.Services
 
 			await _emailService.SendAsync(user.Email, "Reset password", $"For reset password follow link: {_frontendSettings.BaseUrl}/reset-password/{user.ResetToken.Token}");
 
-			return new AuthResponse
+			return new BaseResponse
 			{
 				Success = true
 			};
 		}
 
-		public async Task<AuthResponse> ResetPassword(ResetPasswordRequest request)
+		public async Task<BaseResponse> ResetPassword(ResetPasswordRequest request)
 		{
 			var user = await _context.Users.Include(r => r.ResetToken).FirstOrDefaultAsync(u => u.ResetToken.Token == request.ResetToken);
 			if (user == null)
 			{
-				return new AuthResponse()
+				return new BaseResponse()
 				{
 					Success = false,
 					Error = "Invalid reset token"
@@ -197,7 +208,7 @@ namespace Collectors_Corner_Backend.Services
 
 			if (request.NewPassword != request.ConfirmPassword)
 			{
-				return new AuthResponse()
+				return new BaseResponse()
 				{
 					Success = false,
 					Error = "Passwords are not equal"
@@ -207,7 +218,7 @@ namespace Collectors_Corner_Backend.Services
 			user.PasswordHash = _passwordHasher.HashPassword(user.Username, request.NewPassword);
 			await _context.SaveChangesAsync();
 
-			return new AuthResponse()
+			return new BaseResponse()
 			{
 				Success = true
 			};

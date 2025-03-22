@@ -1,3 +1,4 @@
+using Collectors_Corner_Backend.Models;
 using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.Settings;
 using Collectors_Corner_Backend.Services;
@@ -28,9 +29,12 @@ namespace Collectors_Corner_Backend
 			builder.Services.Configure<RefreshTokenSettings>(configuration.GetRequiredSection("RefreshTokenSettings"));
 			builder.Services.Configure<ResetTokenSettings>(configuration.GetRequiredSection("ResetTokenSettings"));
 			builder.Services.Configure<FrontendSettings>(configuration.GetRequiredSection("FrontendSettings"));
+			builder.Services.Configure<EmailSettings>(configuration.GetRequiredSection("EmailSettings"));
 
 			builder.Services.AddScoped<AuthService>();
+			builder.Services.AddScoped<AccountService>();
 			builder.Services.AddSingleton<TokenService>();
+			builder.Services.AddSingleton<EmailService>();
 
 			builder.Services.AddAuthentication(options =>
 			{
