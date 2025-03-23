@@ -1,4 +1,4 @@
-﻿using Collectors_Corner_Backend.Models;
+﻿using Collectors_Corner_Backend.Models.DTOs.Token;
 using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.Settings;
 using Microsoft.Extensions.Options;
@@ -83,7 +83,6 @@ namespace Collectors_Corner_Backend.Services
 				return null;
 			}
 		}
-
 
 		private string GenerateRandomToken()
 		{

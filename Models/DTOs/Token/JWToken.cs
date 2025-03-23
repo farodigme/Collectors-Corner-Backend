@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Collectors_Corner_Backend.Models
+namespace Collectors_Corner_Backend.Models.DTOs.Token
 {
 	public class JWToken
 	{
