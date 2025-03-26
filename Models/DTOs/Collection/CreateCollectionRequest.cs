@@ -7,17 +7,17 @@ namespace Collectors_Corner_Backend.Models.DTOs.Collection
 	public class CreateCollectionRequest
 	{
 		[Required]
-		[MaxLength(50)]
+		[Length(3,50)]
 		public string Title { get; set; }
 		
-		[MaxLength(200)]		
+		[Length(20,200)]		
 		public string? Description { get; set; }
 
 		[Required]
-		[MaxLength(30)]
+		[Length(5,30)]
 		public string Category { get; set; }
 
 		[Required]
-		public IFormFile Image { get; set; }
+		public IFormFile? Image { get; set; }
 	}
 }

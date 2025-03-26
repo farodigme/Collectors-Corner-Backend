@@ -30,6 +30,7 @@ namespace Collectors_Corner_Backend
 			builder.Services.Configure<ResetTokenSettings>(configuration.GetRequiredSection("ResetTokenSettings"));
 			builder.Services.Configure<FrontendSettings>(configuration.GetRequiredSection("FrontendSettings"));
 			builder.Services.Configure<EmailSettings>(configuration.GetRequiredSection("EmailSettings"));
+			
 
 			builder.Services.AddScoped<AuthService>();
 			builder.Services.AddScoped<AccountService>();
