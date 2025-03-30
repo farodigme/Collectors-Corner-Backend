@@ -18,6 +18,6 @@ namespace Collectors_Corner_Backend.Models.DTOs.Collection
 		public string Category { get; set; }
 
 		[Required]
-		public IFormFile? Image { get; set; }
+		public IFormFile Image { get; set; }
 	}
 }

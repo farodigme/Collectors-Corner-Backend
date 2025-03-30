@@ -30,12 +30,15 @@ namespace Collectors_Corner_Backend
 			builder.Services.Configure<ResetTokenSettings>(configuration.GetRequiredSection("ResetTokenSettings"));
 			builder.Services.Configure<FrontendSettings>(configuration.GetRequiredSection("FrontendSettings"));
 			builder.Services.Configure<EmailSettings>(configuration.GetRequiredSection("EmailSettings"));
-			
+			builder.Services.Configure<ImageServiceSettings>(configuration.GetRequiredSection("ImageServiceSettings"));
 
+			builder.Services.AddHttpClient();
 			builder.Services.AddScoped<AuthService>();
 			builder.Services.AddScoped<AccountService>();
-			builder.Services.AddSingleton<TokenService>();
+			builder.Services.AddScoped<CollectionService>();
 			builder.Services.AddSingleton<EmailService>();
+			builder.Services.AddScoped<ImageService>();
+			builder.Services.AddSingleton<TokenService>();
 
 			builder.Services.AddAuthentication(options =>
 			{
