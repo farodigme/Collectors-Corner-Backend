@@ -3,6 +3,7 @@ using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.Settings;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace Collectors_Corner_Backend.Services
@@ -29,12 +30,17 @@ namespace Collectors_Corner_Backend.Services
 					await using (var stream = image.OpenReadStream())
 					{
 						var fileContent = new StreamContent(stream);
+						fileContent.Headers.ContentType = new MediaTypeHeaderValue(image.ContentType);
 						form.Add(fileContent, "image", image.FileName);
-						Debug.WriteLine("PATH: " + _serviceSettigns.GetImageUploadEndpoint());
+
 						var response = await _httpClient.PostAsync(_serviceSettigns.GetImageUploadEndpoint(), form);
 						var json = await response.Content.ReadAsStringAsync();
 
-						var result = JsonSerializer.Deserialize<ImageUploadResponse>(json);
+						var result = JsonSerializer.Deserialize<ImageUploadResponse>(json, new JsonSerializerOptions()
+						{
+							PropertyNameCaseInsensitive = true
+						});
+
 						if (result == null)
 						{
 							return new ImageUploadResponse()
@@ -56,8 +62,8 @@ namespace Collectors_Corner_Backend.Services
 						return new ImageUploadResponse()
 						{
 							Success = true,
-							ImageNativeUrl = result.ImageNativeUrl,
-							ImageThumbnailUrl = result.ImageThumbnailUrl,
+							NativeImageUrl = result.NativeImageUrl,
+							ThumbnailImageUrl = result.ThumbnailImageUrl,
 						};
 					}
 				}

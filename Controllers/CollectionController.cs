@@ -19,7 +19,8 @@ namespace Collectors_Corner_Backend.Controllers
 		[HttpPost("create")]
 		public async Task<IActionResult> CreateCollection([FromForm] CreateCollectionRequest request)
 		{
-			var result = await _collectionService.CreateCollectionAsync(request);
+			var username = User.Identity?.Name;
+			var result = await _collectionService.CreateCollectionAsync(username, request);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}

@@ -15,8 +15,18 @@ namespace Collectors_Corner_Backend.Services
 			_imageService = imageService;
 		}
 
-		public async Task<CreateCollectionResponse> CreateCollectionAsync(CreateCollectionRequest request)
+		public async Task<CreateCollectionResponse> CreateCollectionAsync(string identityUsername, CreateCollectionRequest request)
 		{
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == identityUsername);
+			if (user == null)
+			{
+				return new CreateCollectionResponse()
+				{
+					Success = false,
+					Error = "Invalid user"
+				};
+			}
+
 			var category = await _context.CollectionCategories.FirstOrDefaultAsync(c => c.Title == request.Category);
 
 			if (category == null)
@@ -40,10 +50,11 @@ namespace Collectors_Corner_Backend.Services
 
 			var newCollection = new Collection()
 			{
+				User = user,
 				Title = request.Title,
 				Description = request.Description,
 				Category = category,
-				ImageUrl = imageUploadResponse.ImageNativeUrl
+				ImageUrl = imageUploadResponse.NativeImageUrl
 			};
 
 			await _context.Collections.AddAsync(newCollection);
@@ -53,8 +64,8 @@ namespace Collectors_Corner_Backend.Services
 			{
 				Success = true,
 				CollectionId = newCollection.Id,
-				ImageNativeUrl = imageUploadResponse.ImageNativeUrl,
-				ImageThumbnailUrl = imageUploadResponse.ImageThumbnailUrl
+				NativeImageUrl = imageUploadResponse.NativeImageUrl,
+				ThumbnailImageUrl = imageUploadResponse.ThumbnailImageUrl
 			};
 		}
 	}
