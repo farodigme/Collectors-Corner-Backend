@@ -1,4 +1,5 @@
-﻿using Collectors_Corner_Backend.Models.DTOs;
+﻿using Collectors_Corner_Backend.Interfaces;
+using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Models.DTOs.Collection;
 using Collectors_Corner_Backend.Models.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -15,9 +16,9 @@ namespace Collectors_Corner_Backend.Services
 			_imageService = imageService;
 		}
 
-		public async Task<CreateCollectionResponse> CreateCollectionAsync(string identityUsername, CreateCollectionRequest request)
+		public async Task<CreateCollectionResponse> CreateCollectionAsync(ICurrentUserService currentUser, CreateCollectionRequest request)
 		{
-			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == identityUsername);
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
 			if (user == null)
 			{
 				return new CreateCollectionResponse()

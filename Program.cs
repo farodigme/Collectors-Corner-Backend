@@ -1,3 +1,4 @@
+using Collectors_Corner_Backend.Interfaces;
 using Collectors_Corner_Backend.Models;
 using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Models.Settings;
@@ -33,12 +34,14 @@ namespace Collectors_Corner_Backend
 			builder.Services.Configure<ImageServiceSettings>(configuration.GetRequiredSection("ImageServiceSettings"));
 
 			builder.Services.AddHttpClient();
+			builder.Services.AddHttpContextAccessor();
 			builder.Services.AddScoped<AuthService>();
 			builder.Services.AddScoped<AccountService>();
 			builder.Services.AddScoped<CollectionService>();
 			builder.Services.AddSingleton<EmailService>();
 			builder.Services.AddScoped<ImageService>();
 			builder.Services.AddSingleton<TokenService>();
+			builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();	
 
 			builder.Services.AddAuthentication(options =>
 			{

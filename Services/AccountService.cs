@@ -1,8 +1,10 @@
-﻿using Collectors_Corner_Backend.Models.DTOs;
+﻿using Collectors_Corner_Backend.Interfaces;
+using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Models.DTOs.Account;
 using Collectors_Corner_Backend.Models.DTOs.Auth;
 using Collectors_Corner_Backend.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Collectors_Corner_Backend.Services
 {
@@ -15,9 +17,9 @@ namespace Collectors_Corner_Backend.Services
 			_context = context;
 		}
 
-		public async Task<GetUserResponse> GetUserAsync(string identityUsername, GetUserRequest request)
+		public async Task<GetUserResponse> GetUserAsync(ICurrentUserService currentUser, GetUserRequest request)
 		{
-			if (string.IsNullOrEmpty(identityUsername))
+			if (string.IsNullOrEmpty(currentUser.Username))
 			{
 				return new GetUserResponse()
 				{
@@ -26,7 +28,7 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			if (identityUsername != request.Username.Trim())
+			if (currentUser.Username != request.Username.Trim())
 			{
 				return new GetUserResponse()
 				{
@@ -35,7 +37,7 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == identityUsername);
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
 
 			if (user == null)
 			{
@@ -49,16 +51,16 @@ namespace Collectors_Corner_Backend.Services
 			return new GetUserResponse()
 			{
 				Success = true,
-				Username = identityUsername,
+				Username = currentUser.Username,
 				Nickname = user.Nickname,
 				Email = user.Email,
 				Created = user.CreatedAt
 			};
 		}
 
-		public async Task<BaseResponse> UpdateNicknameAsync(string identityUsername, UpdateNicknameRequest request)
+		public async Task<BaseResponse> UpdateNicknameAsync(ICurrentUserService currentUser, UpdateNicknameRequest request)
 		{
-			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == identityUsername);
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
 			if (user == null)
 			{
 				return new BaseResponse()
