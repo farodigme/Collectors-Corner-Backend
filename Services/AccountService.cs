@@ -2,6 +2,7 @@
 using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Models.DTOs.Account;
 using Collectors_Corner_Backend.Models.DTOs.Auth;
+using Collectors_Corner_Backend.Models.DTOs.Collection;
 using Collectors_Corner_Backend.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -37,7 +38,7 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
-			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
+			var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == currentUser.Username);
 
 			if (user == null)
 			{
@@ -48,12 +49,40 @@ namespace Collectors_Corner_Backend.Services
 				};
 			}
 
+			var userCollections = await _context.Collections.AsNoTracking().Include(u => u.User).Include(c => c.Category).Where(u => u.User == user).ToListAsync();
+			if (userCollections.Count <= 0)
+			{
+				return new GetUserResponse()
+				{
+					Success = true,
+					Username = currentUser.Username,
+					Nickname = user.Nickname,
+					Email = user.Email,
+					Created = user.CreatedAt
+				};
+			}
+			
+			var collectionsDto = new List<CollectionDto>();
+			foreach (var collection in userCollections)
+			{
+				collectionsDto.Add(new CollectionDto()
+				{
+					Id = collection.Id,
+					Title = collection.Title,
+					Description = collection.Description,
+					Category = collection.Category.Title,
+					ImageUrl = collection.ImageUrl,
+					IsPublic = collection.IsPublic
+				});
+			}
+
 			return new GetUserResponse()
 			{
 				Success = true,
 				Username = currentUser.Username,
 				Nickname = user.Nickname,
 				Email = user.Email,
+				Collections = collectionsDto,
 				Created = user.CreatedAt
 			};
 		}

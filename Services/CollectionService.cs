@@ -55,7 +55,8 @@ namespace Collectors_Corner_Backend.Services
 				Title = request.Title,
 				Description = request.Description,
 				Category = category,
-				ImageUrl = imageUploadResponse.NativeImageUrl
+				ImageUrl = imageUploadResponse.NativeImageUrl,
+				IsPublic = request.IsPublic
 			};
 
 			await _context.Collections.AddAsync(newCollection);
@@ -69,5 +70,34 @@ namespace Collectors_Corner_Backend.Services
 				ThumbnailImageUrl = imageUploadResponse.ThumbnailImageUrl
 			};
 		}
+
+		//public async Task<GetCollectionsResponse> GetCollectionsByUserAsync(ICurrentUserService currentUser)
+		//{
+		//	var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
+		//	if (user == null)
+		//	{
+		//		return new GetCollectionsResponse()
+		//		{
+		//			Success = false,
+		//			Error = "Invalid user"
+		//		};
+		//	}
+
+		//	var collections = await _context.Collections.AsNoTracking().Include(u => u.User).Where(u => u.User == user).ToListAsync();
+		//	if (collections == null || collections.Count <= 0)
+		//	{
+		//		return new GetCollectionsResponse()
+		//		{
+		//			Success = false,
+		//			Error = "User do not have collections"
+		//		};
+		//	}
+
+		//	return new GetCollectionsResponse()
+		//	{
+		//		Success = true,
+		//		Collections = collections
+		//	};
+		//}
 	}
 }

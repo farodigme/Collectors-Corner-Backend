@@ -25,5 +25,12 @@ namespace Collectors_Corner_Backend.Controllers
 			var result = await _collectionService.CreateCollectionAsync(_currentUser, request);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
+
+		//[HttpPost("get")]
+		//public async Task<IActionResult> GetCollections()
+		//{
+		//	var result = await _collectionService.GetCollectionsByUserAsync(_currentUser);
+		//	return result.Success ? Ok(result) : BadRequest(result);
+		//}
 	}
 }
