@@ -16,7 +16,6 @@ namespace Collectors_Corner_Backend.Services
 		private EmailService _emailService;
 		private FrontendSettings _frontendSettings;
 
-
 		public AuthService(
 			ApplicationContext context,
 			TokenService jwtService,
