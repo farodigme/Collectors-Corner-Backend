@@ -2,6 +2,7 @@
 using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Models.DTOs.Collection;
 using Collectors_Corner_Backend.Models.Entities;
+using ImageHosting.Extensions.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Collectors_Corner_Backend.Services
@@ -15,41 +16,35 @@ namespace Collectors_Corner_Backend.Services
 			_context = context;
 			_imageService = imageService;
 		}
+		private static CreateCollectionResponse FailCreateCollection(string error) => new()
+		{
+			Success = false,
+			Error = error
+		};
+		private static GetCollectionsResponse FailCollections(string error) => new()
+		{
+			Success = false,
+			Error = error
+		};
 
 		public async Task<CreateCollectionResponse> CreateCollectionAsync(ICurrentUserService currentUser, CreateCollectionRequest request)
 		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return FailCreateCollection("Invalid user");
+
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
 			if (user == null)
-			{
-				return new CreateCollectionResponse()
-				{
-					Success = false,
-					Error = "Invalid user"
-				};
-			}
+				return FailCreateCollection("User not found");
 
 			var category = await _context.CollectionCategories.FirstOrDefaultAsync(c => c.Title == request.Category);
-
 			if (category == null)
-			{
-				return new CreateCollectionResponse()
-				{
-					Success = false,
-					Error = "Invalid category"
-				};
-			}
+				return FailCreateCollection("Invalid category");
 
 			var imageUploadResponse = await _imageService.UploadImageAsync(request.Image);
 			if (!imageUploadResponse.Success)
-			{
-				return new CreateCollectionResponse()
-				{
-					Success = false,
-					Error = imageUploadResponse.Error
-				};
-			}
+				return FailCreateCollection(imageUploadResponse.Error ?? "Image upload failed");
 
-			var newCollection = new Collection()
+			var newCollection = new Collection
 			{
 				User = user,
 				Title = request.Title,
@@ -62,7 +57,7 @@ namespace Collectors_Corner_Backend.Services
 			await _context.Collections.AddAsync(newCollection);
 			await _context.SaveChangesAsync();
 
-			return new CreateCollectionResponse()
+			return new CreateCollectionResponse
 			{
 				Success = true,
 				CollectionId = newCollection.Id,
@@ -71,33 +66,28 @@ namespace Collectors_Corner_Backend.Services
 			};
 		}
 
-		//public async Task<GetCollectionsResponse> GetCollectionsByUserAsync(ICurrentUserService currentUser)
-		//{
-		//	var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
-		//	if (user == null)
-		//	{
-		//		return new GetCollectionsResponse()
-		//		{
-		//			Success = false,
-		//			Error = "Invalid user"
-		//		};
-		//	}
+		public async Task<GetCollectionsResponse> GetCollectionsByUserAsync(ICurrentUserService currentUser)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return FailCollections("Invalid user");
 
-		//	var collections = await _context.Collections.AsNoTracking().Include(u => u.User).Where(u => u.User == user).ToListAsync();
-		//	if (collections == null || collections.Count <= 0)
-		//	{
-		//		return new GetCollectionsResponse()
-		//		{
-		//			Success = false,
-		//			Error = "User do not have collections"
-		//		};
-		//	}
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
+			if (user == null)
+				return FailCollections("User not found");
 
-		//	return new GetCollectionsResponse()
-		//	{
-		//		Success = true,
-		//		Collections = collections
-		//	};
-		//}
+			var collections = await _context.Collections
+				.AsNoTracking()
+				.Include(c => c.Category)
+				.Where(c => c.UserId == user.Id)
+				.ToListAsync();
+
+			var collectionsDto = CollectionMapper.ToDtoList(collections);
+
+			return new GetCollectionsResponse()
+			{
+				Success = true,
+				Collections = collectionsDto
+			};
+		}
 	}
 }

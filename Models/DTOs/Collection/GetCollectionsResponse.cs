@@ -7,6 +7,6 @@ namespace Collectors_Corner_Backend.Models.DTOs.Collection
 		public bool Success { get; set; }
 		public string? Error { get; set; }
 		
-		public List<Entities.Collection> Collections { get; set; }
+		public List<CollectionDto>? Collections { get; set; }
 	}
 }

@@ -26,11 +26,11 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
-		//[HttpPost("get")]
-		//public async Task<IActionResult> GetCollections()
-		//{
-		//	var result = await _collectionService.GetCollectionsByUserAsync(_currentUser);
-		//	return result.Success ? Ok(result) : BadRequest(result);
-		//}
+		[HttpPost("get")]
+		public async Task<IActionResult> GetUserCollections()
+		{
+			var result = await _collectionService.GetCollectionsByUserAsync(_currentUser);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
 	}
 }
