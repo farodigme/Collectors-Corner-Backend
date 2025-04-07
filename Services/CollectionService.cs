@@ -89,5 +89,26 @@ namespace Collectors_Corner_Backend.Services
 				Collections = collectionsDto
 			};
 		}
+
+		public async Task<GetCollectionsResponse> UpdateUserCollectionAsync(ICurrentUserService currentUser, UpdateCollectionRequest request)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return FailCollections("Invalid user");
+
+			var collection = await _context.Collections
+				.Include(c => c.User.Username == currentUser.Username)
+				.FirstOrDefaultAsync(u => u.Id == request.collectionId);
+
+			if (collection == null)
+				return FailCollections("Collection not found");
+
+			collection.Title = request.Title;
+			collection.Description = request.Description;
+			collection.Category.Title = request.Category;
+			collection.IsPublic = request.IsPublic;
+			collection.ImageUrl = null;
+
+			throw new NotImplementedException();
+		}
 	}
 }
