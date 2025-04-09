@@ -26,6 +26,15 @@ namespace Collectors_Corner_Backend.Services
 			Success = false,
 			Error = error
 		};
+		private static BaseResponse Fail(string error) => new()
+		{
+			Success = false,
+			Error = error
+		};
+		private static BaseResponse Success() => new()
+		{
+			Success = true
+		};
 
 		public async Task<CreateCollectionResponse> CreateCollectionAsync(ICurrentUserService currentUser, CreateCollectionRequest request)
 		{
@@ -110,5 +119,20 @@ namespace Collectors_Corner_Backend.Services
 
 			throw new NotImplementedException();
 		}
+
+		public async Task<BaseResponse> DeleteCollection(ICurrentUserService currentUser, int collectionId)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail("Invalid user");
+
+			var collection = await _context.Collections.Include(u => u.User.Username == currentUser.Username).FirstOrDefaultAsync(u => u.Id == collectionId);
+			if (collection == null)
+				return Fail("Invalid collection");
+
+			_context.Collections.Remove(collection);
+			await _context.SaveChangesAsync();
+
+			return Success();
+		} 
 	}
 }
