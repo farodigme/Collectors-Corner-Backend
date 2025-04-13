@@ -9,6 +9,7 @@
 		public string? Description { get; set; }
 		public int CategoryId { get; set; }
 		public CardCategory Category { get; set; }
-		public string ImageUrl { get; set; }
+		public string? ImageUrl { get; set; }
+		public bool IsPublic { get; set; }
 	}
 }

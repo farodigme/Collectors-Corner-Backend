@@ -2,11 +2,8 @@
 
 namespace Collectors_Corner_Backend.Models.DTOs.Collection
 {
-	public class GetCollectionsResponse
+	public class GetCollectionsResponse : BaseResponse
 	{
-		public bool Success { get; set; }
-		public string? Error { get; set; }
-		
 		public List<CollectionDto>? Collections { get; set; }
 	}
 }

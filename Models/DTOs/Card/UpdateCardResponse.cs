@@ -2,24 +2,14 @@
 
 namespace Collectors_Corner_Backend.Models.DTOs.Collection
 {
-	public class UpdateCollectionRequest
+	public class UpdateCardResponse : BaseResponse
 	{
-		[Required]
-		public int collectionId { get; set; }
-
-		[Required]
-		[Length(3, 50)]
+		public int cardId { get; set; }
 		public string Title { get; set; }
-
-		[Length(20, 200)]
 		public string? Description { get; set; }
-
-		[Required]
-		[Length(5, 30)]
 		public string Category { get; set; }
-
-		[Required]
 		public bool IsPublic { get; set; }
-		public IFormFile? Image { get; set; }
+		public string? NativeImageUrl { get; set; }
+		public string? ThumbnailImageUrl { get; set; }
 	}
 }

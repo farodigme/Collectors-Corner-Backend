@@ -1,9 +1,7 @@
 ﻿namespace Collectors_Corner_Backend.Models.DTOs.Auth
 {
-	public class AuthResponse
+	public class AuthResponse : BaseResponse
 	{
-		public bool Success { get; set; }
-		public string? Error { get; set; }
 		public string? AccessToken { get; set; }
 		public DateTime? AccessTokenExpires { get; set; }
 		public string? RefreshToken { get; set; }

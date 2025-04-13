@@ -1,5 +1,7 @@
 ﻿using Collectors_Corner_Backend.Interfaces;
+using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Models.DTOs.Card;
+using Collectors_Corner_Backend.Models.DTOs.Collection;
 using Collectors_Corner_Backend.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,49 +9,126 @@ namespace Collectors_Corner_Backend.Services
 {
 	public class CardService
 	{
-		private ApplicationContext _context;
-		private ImageService _imageService;
+		private readonly ApplicationContext _context;
+		private readonly ImageService _imageService;
+
 		public CardService(ApplicationContext context, ImageService imageService)
 		{
 			_context = context;
 			_imageService = imageService;
 		}
 
+		private static T Fail<T>(string error) where T : BaseResponse, new() => new() { Success = false, Error = error };
+		private static T Success<T>(Action<T>? configure = null) where T : BaseResponse, new()
+		{
+			var response = new T { Success = true };
+			configure?.Invoke(response);
+			return response;
+		}
+
 		public async Task<CreateCardResponse> CreateCardAsync(ICurrentUserService currentUser, CreateCardRequest request)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
-				return new CreateCardResponse() { Success = false, Error = "Invalid user" };
+				return Fail<CreateCardResponse>("Invalid user");
 
-			var collection = await _context.Collections.Include(u => u.User.Username == currentUser.Username).FirstOrDefaultAsync(c => c.Id == request.CollectionId);
+			var collection = await _context.Collections
+				.Include(c => c.User)
+				.FirstOrDefaultAsync(c => c.Id == request.CollectionId && c.User.Username == currentUser.Username);
 			if (collection == null)
-				return new CreateCardResponse() { Success = false, Error = "Invalid collection" };
+				return Fail<CreateCardResponse>("Invalid collection");
 
 			var category = await _context.CardCategories.FirstOrDefaultAsync(c => c.Title == request.Category);
 			if (category == null)
-				return new CreateCardResponse() { Success = false, Error = "Invalid category" };
+				return Fail<CreateCardResponse>("Invalid category");
 
 			var imageUploadResponse = await _imageService.UploadImageAsync(request.Image);
 			if (!imageUploadResponse.Success)
-				return new CreateCardResponse() { Success = false, Error = "Image upload error" };
+				return Fail<CreateCardResponse>(imageUploadResponse.Error ?? "Image upload failed");
 
-			var card = new Card()
+			var card = new Card
 			{
-				Title = request.Title,
-				Description = request.Description,
+				Title = request.Title.Trim(),
+				Description = request.Description?.Trim(),
 				Category = category,
-				ImageUrl = imageUploadResponse.NativeImageUrl
+				ImageUrl = imageUploadResponse.NativeImageUrl,
+				Collection = collection,
+				IsPublic = request.IsPublic
 			};
 
-			await _context.Collections.AddAsync(collection);
+			await _context.Cards.AddAsync(card);
 			await _context.SaveChangesAsync();
 
-			return new CreateCardResponse()
+			return Success<CreateCardResponse>(r =>
 			{
-				Success = true,
-				CardId = card.Id,
-				NativeImageUrl = imageUploadResponse.NativeImageUrl,
-				ThumbnailImageUrl = imageUploadResponse.ThumbnailImageUrl,
-			};
+				r.CardId = card.Id;
+				r.NativeImageUrl = imageUploadResponse.NativeImageUrl;
+				r.ThumbnailImageUrl = imageUploadResponse.ThumbnailImageUrl;
+			});
+		}
+
+		public async Task<UpdateCardResponse> UpdateCardAsync(ICurrentUserService currentUser, UpdateCardRequest request)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail<UpdateCardResponse>("Invalid user");
+
+			var card = await _context.Cards
+				.Include(c => c.Category)
+				.Include(c => c.Collection)
+				.ThenInclude(c => c.User)
+				.FirstOrDefaultAsync(c => c.Id == request.cardId && c.Collection.User.Username == currentUser.Username);
+
+			if (card == null)
+				return Fail<UpdateCardResponse>("Card not found");
+
+			card.Title = request.Title.Trim();
+			card.Description = request.Description?.Trim();
+			card.Category.Title = request.Category.Trim();
+			card.IsPublic = request.IsPublic;
+
+			string? nativeUrl = card.ImageUrl;
+			string? thumbUrl = nativeUrl is not null ? nativeUrl + "_thumb" : null;
+
+			if (request.Image != null)
+			{
+				var imageUploadResponse = await _imageService.UploadImageAsync(request.Image);
+				if (!imageUploadResponse.Success)
+					return Fail<UpdateCardResponse>(imageUploadResponse.Error ?? "Image upload failed");
+
+				card.ImageUrl = imageUploadResponse.NativeImageUrl;
+				nativeUrl = imageUploadResponse.NativeImageUrl;
+				thumbUrl = imageUploadResponse.ThumbnailImageUrl;
+			}
+
+			await _context.SaveChangesAsync();
+
+			return Success<UpdateCardResponse>(r =>
+			{
+				r.Title = card.Title;
+				r.Description = card.Description;
+				r.Category = card.Category.Title;
+				r.IsPublic = card.IsPublic;
+				r.NativeImageUrl = nativeUrl;
+				r.ThumbnailImageUrl = thumbUrl;
+			});
+		}
+
+		public async Task<BaseResponse> DeleteCardAsync(ICurrentUserService currentUser, int cardId)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail<BaseResponse>("Invalid user");
+
+			var card = await _context.Cards
+				.Include(c => c.Collection)
+				.ThenInclude(c => c.User)
+				.FirstOrDefaultAsync(c => c.Id == cardId && c.Collection.User.Username == currentUser.Username);
+
+			if (card == null)
+				return Fail<BaseResponse>("Invalid card");
+
+			_context.Cards.Remove(card);
+			await _context.SaveChangesAsync();
+
+			return Success<BaseResponse>();
 		}
 	}
 }

@@ -2,10 +2,11 @@
 
 namespace Collectors_Corner_Backend.Models.DTOs.Collection
 {
-	public class UpdateCollectionRequest
+	public class UpdateCardRequest
+
 	{
 		[Required]
-		public int collectionId { get; set; }
+		public int cardId { get; set; }
 
 		[Required]
 		[Length(3, 50)]

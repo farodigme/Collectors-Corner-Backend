@@ -1,6 +1,7 @@
 ﻿using Collectors_Corner_Backend.Interfaces;
 using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Models.DTOs.Collection;
+using Collectors_Corner_Backend.Models.DTOs.ImageService;
 using Collectors_Corner_Backend.Models.Entities;
 using ImageHosting.Extensions.Mappers;
 using Microsoft.EntityFrameworkCore;
@@ -9,55 +10,45 @@ namespace Collectors_Corner_Backend.Services
 {
 	public class CollectionService
 	{
-		private ApplicationContext _context;
-		private ImageService _imageService;
+		private readonly ApplicationContext _context;
+		private readonly ImageService _imageService;
+
 		public CollectionService(ApplicationContext context, ImageService imageService)
 		{
 			_context = context;
 			_imageService = imageService;
 		}
-		private static CreateCollectionResponse FailCreateCollection(string error) => new()
+
+		private T Fail<T>(string error) where T : BaseResponse, new() => new() { Success = false, Error = error };
+		private T Success<T>(Action<T>? configure = null) where T : BaseResponse, new()
 		{
-			Success = false,
-			Error = error
-		};
-		private static GetCollectionsResponse FailCollections(string error) => new()
-		{
-			Success = false,
-			Error = error
-		};
-		private static BaseResponse Fail(string error) => new()
-		{
-			Success = false,
-			Error = error
-		};
-		private static BaseResponse Success() => new()
-		{
-			Success = true
-		};
+			var response = new T { Success = true };
+			configure?.Invoke(response);
+			return response;
+		}
 
 		public async Task<CreateCollectionResponse> CreateCollectionAsync(ICurrentUserService currentUser, CreateCollectionRequest request)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
-				return FailCreateCollection("Invalid user");
+				return Fail<CreateCollectionResponse>("Invalid user");
 
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
 			if (user == null)
-				return FailCreateCollection("User not found");
+				return Fail<CreateCollectionResponse>("User not found");
 
 			var category = await _context.CollectionCategories.FirstOrDefaultAsync(c => c.Title == request.Category);
 			if (category == null)
-				return FailCreateCollection("Invalid category");
+				return Fail<CreateCollectionResponse>("Invalid category");
 
 			var imageUploadResponse = await _imageService.UploadImageAsync(request.Image);
 			if (!imageUploadResponse.Success)
-				return FailCreateCollection(imageUploadResponse.Error ?? "Image upload failed");
+				return Fail<CreateCollectionResponse>(imageUploadResponse.Error ?? "Image upload failed");
 
 			var newCollection = new Collection
 			{
 				User = user,
-				Title = request.Title,
-				Description = request.Description,
+				Title = request.Title.Trim(),
+				Description = request.Description?.Trim(),
 				Category = category,
 				ImageUrl = imageUploadResponse.NativeImageUrl,
 				IsPublic = request.IsPublic
@@ -66,23 +57,22 @@ namespace Collectors_Corner_Backend.Services
 			await _context.Collections.AddAsync(newCollection);
 			await _context.SaveChangesAsync();
 
-			return new CreateCollectionResponse
+			return Success<CreateCollectionResponse>(r =>
 			{
-				Success = true,
-				CollectionId = newCollection.Id,
-				NativeImageUrl = imageUploadResponse.NativeImageUrl,
-				ThumbnailImageUrl = imageUploadResponse.ThumbnailImageUrl
-			};
+				r.CollectionId = newCollection.Id;
+				r.NativeImageUrl = imageUploadResponse.NativeImageUrl;
+				r.ThumbnailImageUrl = imageUploadResponse.ThumbnailImageUrl;
+			});
 		}
 
 		public async Task<GetCollectionsResponse> GetCollectionsByUserAsync(ICurrentUserService currentUser)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
-				return FailCollections("Invalid user");
+				return Fail<GetCollectionsResponse>("Invalid user");
 
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
 			if (user == null)
-				return FailCollections("User not found");
+				return Fail<GetCollectionsResponse>("User not found");
 
 			var collections = await _context.Collections
 				.AsNoTracking()
@@ -92,47 +82,72 @@ namespace Collectors_Corner_Backend.Services
 
 			var collectionsDto = CollectionMapper.ToDtoList(collections);
 
-			return new GetCollectionsResponse()
-			{
-				Success = true,
-				Collections = collectionsDto
-			};
+			return Success<GetCollectionsResponse>(r => r.Collections = collectionsDto);
 		}
 
-		public async Task<GetCollectionsResponse> UpdateUserCollectionAsync(ICurrentUserService currentUser, UpdateCollectionRequest request)
+		public async Task<UpdateCardResponse> UpdateUserCollectionAsync(ICurrentUserService currentUser, UpdateCollectionRequest request)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
-				return FailCollections("Invalid user");
+				return Fail<UpdateCardResponse>("Invalid user");
 
 			var collection = await _context.Collections
-				.Include(c => c.User.Username == currentUser.Username)
-				.FirstOrDefaultAsync(u => u.Id == request.collectionId);
+				.Include(c => c.Category)
+				.Include(c => c.User)
+				.FirstOrDefaultAsync(c => c.Id == request.collectionId && c.User.Username == currentUser.Username);
 
 			if (collection == null)
-				return FailCollections("Collection not found");
+				return Fail<UpdateCardResponse>("Collection not found");
 
-			collection.Title = request.Title;
-			collection.Description = request.Description;
-			collection.Category.Title = request.Category;
+			collection.Title = request.Title.Trim();
+			collection.Description = request.Description?.Trim();
+			collection.Category.Title = request.Category.Trim();
 			collection.IsPublic = request.IsPublic;
-			collection.ImageUrl = null;
 
-			throw new NotImplementedException();
+			string? nativeUrl = collection.ImageUrl;
+			string? thumbUrl = nativeUrl is not null ? nativeUrl + "_thumb" : null;
+
+			if (request.Image != null)
+			{
+				var imageUploadResponse = await _imageService.UploadImageAsync(request.Image);
+				if (!imageUploadResponse.Success)
+					return Fail<UpdateCardResponse>(imageUploadResponse.Error ?? "Image upload failed");
+
+				collection.ImageUrl = imageUploadResponse.NativeImageUrl;
+
+				nativeUrl = imageUploadResponse.NativeImageUrl;
+				thumbUrl = imageUploadResponse.ThumbnailImageUrl;
+			}
+
+			await _context.SaveChangesAsync();
+
+			return Success<UpdateCardResponse>(r =>
+			{
+				r.Title = collection.Title;
+				r.Description = collection.Description;
+				r.Category = collection.Category.Title;
+				r.IsPublic = collection.IsPublic;
+				r.NativeImageUrl = nativeUrl;
+				r.ThumbnailImageUrl = thumbUrl;
+			});
 		}
+
 
 		public async Task<BaseResponse> DeleteCollection(ICurrentUserService currentUser, int collectionId)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
-				return Fail("Invalid user");
+				return Fail<BaseResponse>("Invalid user");
 
-			var collection = await _context.Collections.Include(u => u.User.Username == currentUser.Username).FirstOrDefaultAsync(u => u.Id == collectionId);
+			var collection = await _context.Collections
+				.Include(c => c.User)
+				.FirstOrDefaultAsync(c => c.Id == collectionId && c.User.Username == currentUser.Username);
+
 			if (collection == null)
-				return Fail("Invalid collection");
+				return Fail<BaseResponse>("Invalid collection");
 
 			_context.Collections.Remove(collection);
 			await _context.SaveChangesAsync();
 
-			return Success();
-		} 
+			return Success<BaseResponse>();
+		}
 	}
 }
