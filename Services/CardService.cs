@@ -80,9 +80,15 @@ namespace Collectors_Corner_Backend.Services
 			if (card == null)
 				return Fail<UpdateCardResponse>("Card not found");
 
+			var category = await _context.CardCategories
+				.FirstOrDefaultAsync(c => c.Title == request.Category);
+
+			if (category == null)
+				return Fail<UpdateCardResponse>("Invalid category");
+
 			card.Title = request.Title.Trim();
 			card.Description = request.Description?.Trim();
-			card.Category.Title = request.Category.Trim();
+			card.Category = category;
 			card.IsPublic = request.IsPublic;
 
 			string? nativeUrl = card.ImageUrl;
@@ -103,6 +109,7 @@ namespace Collectors_Corner_Backend.Services
 
 			return Success<UpdateCardResponse>(r =>
 			{
+				r.cardId = card.Id;
 				r.Title = card.Title;
 				r.Description = card.Description;
 				r.Category = card.Category.Title;

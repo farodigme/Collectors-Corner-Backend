@@ -85,10 +85,10 @@ namespace Collectors_Corner_Backend.Services
 			return Success<GetCollectionsResponse>(r => r.Collections = collectionsDto);
 		}
 
-		public async Task<UpdateCardResponse> UpdateUserCollectionAsync(ICurrentUserService currentUser, UpdateCollectionRequest request)
+		public async Task<UpdateCollectionResponse> UpdateUserCollectionAsync(ICurrentUserService currentUser, UpdateCollectionRequest request)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
-				return Fail<UpdateCardResponse>("Invalid user");
+				return Fail<UpdateCollectionResponse>("Invalid user");
 
 			var collection = await _context.Collections
 				.Include(c => c.Category)
@@ -96,11 +96,17 @@ namespace Collectors_Corner_Backend.Services
 				.FirstOrDefaultAsync(c => c.Id == request.collectionId && c.User.Username == currentUser.Username);
 
 			if (collection == null)
-				return Fail<UpdateCardResponse>("Collection not found");
+				return Fail<UpdateCollectionResponse>("Collection not found");
+
+			var category = await _context.CollectionCategories
+				.FirstOrDefaultAsync(c => c.Title == request.Category);
+
+			if (category == null)
+				return Fail<UpdateCollectionResponse>("Invalid category");
 
 			collection.Title = request.Title.Trim();
 			collection.Description = request.Description?.Trim();
-			collection.Category.Title = request.Category.Trim();
+			collection.Category = category;
 			collection.IsPublic = request.IsPublic;
 
 			string? nativeUrl = collection.ImageUrl;
@@ -110,7 +116,7 @@ namespace Collectors_Corner_Backend.Services
 			{
 				var imageUploadResponse = await _imageService.UploadImageAsync(request.Image);
 				if (!imageUploadResponse.Success)
-					return Fail<UpdateCardResponse>(imageUploadResponse.Error ?? "Image upload failed");
+					return Fail<UpdateCollectionResponse>(imageUploadResponse.Error ?? "Image upload failed");
 
 				collection.ImageUrl = imageUploadResponse.NativeImageUrl;
 
@@ -120,8 +126,9 @@ namespace Collectors_Corner_Backend.Services
 
 			await _context.SaveChangesAsync();
 
-			return Success<UpdateCardResponse>(r =>
+			return Success<UpdateCollectionResponse>(r =>
 			{
+				r.collectionId = collection.Id;
 				r.Title = collection.Title;
 				r.Description = collection.Description;
 				r.Category = collection.Category.Title;
