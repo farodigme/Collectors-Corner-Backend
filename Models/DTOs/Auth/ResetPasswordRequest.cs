@@ -5,15 +5,15 @@ namespace Collectors_Corner_Backend.Models.DTOs.Auth
 	public class ResetPasswordRequest
 	{
 		[Required]
-		[MaxLength(64)]
+		[Length(64,64)]
 		public string ResetToken { get; set; }
 
 		[Required]
-		[MaxLength(16)]
+		[Length(8,16)]
 		public string NewPassword { get; set; }
 
 		[Required]
-		[MaxLength(16)]
+		[Length(8, 16)]
 		public string ConfirmPassword { get; set; }
 	}
 }

@@ -24,6 +24,19 @@ namespace Collectors_Corner_Backend
 					);
 			});
 
+			var frontendSettings = builder.Configuration.GetSection("FrontendSettings").Get<FrontendSettings>();
+
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowFrontend", policy =>
+				{
+					policy.WithOrigins(frontendSettings.BaseUrl)
+						  .AllowAnyHeader()
+						  .AllowAnyMethod()
+						  .AllowCredentials();
+				});
+			});
+
 			builder.Services.Configure<JwtSettings>(configuration.GetRequiredSection("JwtSettings"));
 			var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
@@ -38,6 +51,7 @@ namespace Collectors_Corner_Backend
 			builder.Services.AddScoped<AuthService>();
 			builder.Services.AddScoped<AccountService>();
 			builder.Services.AddScoped<CollectionService>();
+			builder.Services.AddScoped<CardService>();
 			builder.Services.AddSingleton<EmailService>();
 			builder.Services.AddScoped<ImageService>();
 			builder.Services.AddSingleton<TokenService>();
@@ -56,6 +70,7 @@ namespace Collectors_Corner_Backend
 
 			var app = builder.Build();
 
+			app.UseCors("AllowFrontend");
 			app.UseHttpsRedirection();
 			app.UseAuthentication();
 			app.UseAuthorization();

@@ -5,6 +5,7 @@ using Collectors_Corner_Backend.Models.Settings;
 using Collectors_Corner_Backend.Models.DTOs.Auth;
 using Microsoft.Extensions.Options;
 using Collectors_Corner_Backend.Models.DTOs;
+using System.Diagnostics;
 
 namespace Collectors_Corner_Backend.Services
 {
@@ -31,7 +32,10 @@ namespace Collectors_Corner_Backend.Services
 
 		public async Task<AuthResponse> Login(LoginRequest model)
 		{
-			var user = await _context.Users.Include(x => x.RefreshToken).FirstOrDefaultAsync(u => u.Username == model.Username);
+			var user = await _context.Users
+				.Include(x => x.RefreshToken)
+				.FirstOrDefaultAsync(u => u.Username == model.Username);
+
 			if (user == null)
 			{
 				return new AuthResponse()
@@ -129,7 +133,10 @@ namespace Collectors_Corner_Backend.Services
 			}
 
 			var username = principal.Identity.Name;
-			var user = await _context.Users.Include(t => t.RefreshToken).FirstOrDefaultAsync(u => u.Username == username);
+
+			var user = await _context.Users
+				.Include(t => t.RefreshToken)
+				.FirstOrDefaultAsync(u => u.Username == username);
 
 			if (user == null)
 			{
@@ -172,7 +179,10 @@ namespace Collectors_Corner_Backend.Services
 
 		public async Task<BaseResponse> ForgotPassword(ForgotPasswordRequest request)
 		{
-			var user = await _context.Users.Include(r => r.ResetToken).FirstOrDefaultAsync(u => u.Email == request.Email);
+			var user = await _context.Users
+				.Include(r => r.ResetToken)
+				.FirstOrDefaultAsync(u => u.Email == request.Email);
+
 			if (user == null)
 			{
 				return new BaseResponse()
@@ -186,7 +196,7 @@ namespace Collectors_Corner_Backend.Services
 			await _context.SaveChangesAsync();
 
 			await _emailService.SendAsync(user.Email, "Reset password", $"For reset password follow link: {_frontendSettings.BaseUrl}/reset-password/{user.ResetToken.Token}");
-
+			
 			return new BaseResponse
 			{
 				Success = true
@@ -195,13 +205,25 @@ namespace Collectors_Corner_Backend.Services
 
 		public async Task<BaseResponse> ResetPassword(ResetPasswordRequest request)
 		{
-			var user = await _context.Users.Include(r => r.ResetToken).FirstOrDefaultAsync(u => u.ResetToken.Token == request.ResetToken);
+			var user = await _context.Users
+				.Include(r => r.ResetToken)
+				.FirstOrDefaultAsync(u => u.ResetToken.Token == request.ResetToken);
+
 			if (user == null)
 			{
 				return new BaseResponse()
 				{
 					Success = false,
 					Error = "Invalid reset token"
+				};
+			}
+
+			if (user.ResetToken.IsExpired)
+			{
+				return new BaseResponse()
+				{
+					Success = false,
+					Error = "Reset token is expired"
 				};
 			}
 
@@ -215,6 +237,7 @@ namespace Collectors_Corner_Backend.Services
 			}
 
 			user.PasswordHash = _passwordHasher.HashPassword(user.Username, request.NewPassword);
+			_context.ResetTokens.Remove(user.ResetToken);
 			await _context.SaveChangesAsync();
 
 			return new BaseResponse()
