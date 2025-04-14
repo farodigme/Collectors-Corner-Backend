@@ -21,9 +21,9 @@ namespace Collectors_Corner_Backend.Controllers
 		}
 
 		[HttpGet("getuser")]
-		public async Task<IActionResult> GetUser([FromQuery] GetUserRequest request)
+		public async Task<IActionResult> GetUser()
 		{
-			var result = await _accountService.GetUserAsync(_currentUser, request);
+			var result = await _accountService.GetUserAsync(_currentUser);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 

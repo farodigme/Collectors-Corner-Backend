@@ -34,9 +34,9 @@ namespace Collectors_Corner_Backend.Services
 			Error = error
 		};
 
-		public async Task<GetUserResponse> GetUserAsync(ICurrentUserService currentUser, GetUserRequest request)
+		public async Task<GetUserResponse> GetUserAsync(ICurrentUserService currentUser)
 		{
-			if (string.IsNullOrWhiteSpace(currentUser.Username) || currentUser.Username != request.Username.Trim())
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
 				return InvalidUser("Invalid user");
 
 			var user = await _context.Users
