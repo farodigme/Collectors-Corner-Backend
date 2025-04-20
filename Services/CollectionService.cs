@@ -139,7 +139,7 @@ namespace Collectors_Corner_Backend.Services
 		}
 
 
-		public async Task<BaseResponse> DeleteCollection(ICurrentUserService currentUser, int collectionId)
+		public async Task<BaseResponse> DeleteCollectionAsync(ICurrentUserService currentUser, int collectionId)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
 				return Fail<BaseResponse>("Invalid user");

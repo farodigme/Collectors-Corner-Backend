@@ -119,7 +119,7 @@ namespace Collectors_Corner_Backend.Services
 			});
 		}
 
-		public async Task<BaseResponse> DeleteCardAsync(ICurrentUserService currentUser, int cardId)
+		public async Task<BaseResponse> DeleteCardAsync(ICurrentUserService currentUser, int requestCardId)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
 				return Fail<BaseResponse>("Invalid user");
@@ -127,7 +127,7 @@ namespace Collectors_Corner_Backend.Services
 			var card = await _context.Cards
 				.Include(c => c.Collection)
 				.ThenInclude(c => c.User)
-				.FirstOrDefaultAsync(c => c.Id == cardId && c.Collection.User.Username == currentUser.Username);
+				.FirstOrDefaultAsync(c => c.Id == requestCardId && c.Collection.User.Username == currentUser.Username);
 
 			if (card == null)
 				return Fail<BaseResponse>("Invalid card");
