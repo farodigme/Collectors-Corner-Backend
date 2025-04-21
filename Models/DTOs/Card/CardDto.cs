@@ -1,8 +1,6 @@
-﻿using Collectors_Corner_Backend.Models.Entities;
-
-namespace Collectors_Corner_Backend.Models.DTOs.Collection
+﻿namespace Collectors_Corner_Backend.Models.DTOs.Card
 {
-	public class CollectionDto
+	public class CardDto
 	{
 		public int Id { get; set; }
 		public string Title { get; set; }

@@ -27,6 +27,13 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
+		[HttpGet("get")]
+		public async Task<IActionResult> GetCardsByCollection([FromBody] int collectionId)
+		{
+			var result = await _cardService.GetCardsByCollectionAsync(_currentUser, collectionId);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
 		[HttpPost("update")]
 		public async Task<IActionResult> UpdateCard([FromForm] UpdateCardRequest request)
 		{

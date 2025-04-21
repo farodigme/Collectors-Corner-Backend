@@ -1,4 +1,5 @@
-﻿using Collectors_Corner_Backend.Interfaces;
+﻿using Collectors_Corner_Backend.Extensions.Mappers;
+using Collectors_Corner_Backend.Interfaces;
 using Collectors_Corner_Backend.Models.DTOs;
 using Collectors_Corner_Backend.Models.DTOs.Card;
 using Collectors_Corner_Backend.Models.DTOs.Collection;
@@ -66,6 +67,26 @@ namespace Collectors_Corner_Backend.Services
 			});
 		}
 
+		public async Task<GetCardsByCollectionResponse> GetCardsByCollectionAsync(ICurrentUserService currentUser, int collectionId)
+		{
+			if (collectionId <= 0)
+				return Fail<GetCardsByCollectionResponse>("Invalid collection id");
+
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail<GetCardsByCollectionResponse>("Invalid user");
+
+			var cards = await _context.Cards
+				.Where(c => c.CollectionId == collectionId)
+				.ToListAsync();
+
+			if (!cards.Any())
+				return Fail<GetCardsByCollectionResponse>("No cards on this collection");
+
+			var cardsDto = CardMapper.ToDtoList(cards);
+
+			return Success<GetCardsByCollectionResponse>(c => c.Cards = cardsDto);
+		}
+
 		public async Task<UpdateCardResponse> UpdateCardAsync(ICurrentUserService currentUser, UpdateCardRequest request)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
@@ -121,6 +142,9 @@ namespace Collectors_Corner_Backend.Services
 
 		public async Task<BaseResponse> DeleteCardAsync(ICurrentUserService currentUser, int requestCardId)
 		{
+			if (requestCardId <= 0)
+				return Fail<BaseResponse>("Invalid card id");
+
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
 				return Fail<BaseResponse>("Invalid user");
 
