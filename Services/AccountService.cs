@@ -70,5 +70,20 @@ namespace Collectors_Corner_Backend.Services
 
 			return Success();
 		}
+
+		public async Task<BaseResponse> UpdateEmailAsync(ICurrentUserService currentUser, UpdateEmailRequest request)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail("Invalid user");
+
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
+			if (user == null)
+				return Fail("User not found");
+
+			user.Email = request.Email.Trim();
+			await _context.SaveChangesAsync();
+
+			return Success();
+		}
 	}
 }
