@@ -40,5 +40,12 @@ namespace Collectors_Corner_Backend.Controllers
 			var result = await _accountService.UpdateEmailAsync(_currentUser, request);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
+
+		[HttpPost("update-avatar")]
+		public async Task<IActionResult> UpdateAvatar([FromBody] UpdateAvatarRequest request)
+		{
+			var result = await _accountService.UpdateAvatarAsync(_currentUser, request);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
 	}
 }
