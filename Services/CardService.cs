@@ -76,6 +76,7 @@ namespace Collectors_Corner_Backend.Services
 				return Fail<GetCardsByCollectionResponse>("Invalid user");
 
 			var cards = await _context.Cards
+				.Include(c => c.Category)
 				.Where(c => c.CollectionId == collectionId)
 				.ToListAsync();
 

@@ -41,8 +41,8 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
-		[HttpPost("update-avatar")]
-		public async Task<IActionResult> UpdateAvatar([FromBody] UpdateAvatarRequest request)
+		[HttpPut("update-avatar")]
+		public async Task<IActionResult> UpdateAvatar([FromForm] UpdateAvatarRequest request)
 		{
 			var result = await _accountService.UpdateAvatarAsync(_currentUser, request);
 			return result.Success ? Ok(result) : BadRequest(result);
