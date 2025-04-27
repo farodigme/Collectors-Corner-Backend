@@ -77,5 +77,5 @@ dotnet run
 |:-----:|:-----------------------:|:-------------------------------:|
 | GET   | `/collections/get`          | Получить все коллекции          |
 | POST  | `/collections/create`          | Добавить новую коллекцию         |
-| PUT   | `/collections/update`     | Обновить коллекцию по ID         |
-| DELETE| `/collections/delete`     | Удалить коллекцию по ID          |
+| PUT   | `/collections/update`     | Обновить коллекцию         |
+| DELETE| `/collections/delete`     | Удалить коллекцию          |
