@@ -1,5 +1,6 @@
 ﻿using Collectors_Corner_Backend.Interfaces;
 using Collectors_Corner_Backend.Models.DTOs.Card;
+using Collectors_Corner_Backend.Models.DTOs.Collection;
 using Collectors_Corner_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,27 @@ namespace Collectors_Corner_Backend.Controllers
 		public async Task<IActionResult> CreateCard([FromForm] CreateCardRequest request)
 		{
 			var result = await _cardService.CreateCardAsync(_currentUser, request);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
+		[HttpGet("get")]
+		public async Task<IActionResult> GetCardsByCollection([FromQuery] int collectionId)
+		{
+			var result = await _cardService.GetCardsByCollectionAsync(_currentUser, collectionId);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
+		[HttpPut("update")]
+		public async Task<IActionResult> UpdateCard([FromForm] UpdateCardRequest request)
+		{
+			var result = await _cardService.UpdateCardAsync(_currentUser, request);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
+		[HttpDelete("delete")]
+		public async Task<IActionResult> DeleteCard([FromBody] int id)
+		{
+			var result = await _cardService.DeleteCardAsync(_currentUser, id);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}

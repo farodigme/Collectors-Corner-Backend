@@ -26,14 +26,14 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
-		[HttpPost("get")]
+		[HttpGet("get")]
 		public async Task<IActionResult> GetUserCollections()
 		{
 			var result = await _collectionService.GetCollectionsByUserAsync(_currentUser);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
-		[HttpPost("update")]
+		[HttpPut("update")]
 		public async Task<IActionResult> UpdateCollection([FromForm] UpdateCollectionRequest request)
 		{
 			var result = await _collectionService.UpdateUserCollectionAsync(_currentUser, request);
@@ -43,7 +43,7 @@ namespace Collectors_Corner_Backend.Controllers
 		[HttpDelete("delete")]
 		public async Task<IActionResult> DeleteCollection([FromBody] int id)
 		{
-			var result = await _collectionService.DeleteCollection(_currentUser, id);
+			var result = await _collectionService.DeleteCollectionAsync(_currentUser, id);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}

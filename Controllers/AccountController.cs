@@ -20,7 +20,7 @@ namespace Collectors_Corner_Backend.Controllers
 			_currentUser = currentUser;
 		}
 
-		[HttpGet("getuser")]
+		[HttpGet("get-user")]
 		public async Task<IActionResult> GetUser()
 		{
 			var result = await _accountService.GetUserAsync(_currentUser);
@@ -31,6 +31,20 @@ namespace Collectors_Corner_Backend.Controllers
 		public async Task<IActionResult> UpdateNickname([FromBody] UpdateNicknameRequest request)
 		{
 			var result = await _accountService.UpdateNicknameAsync(_currentUser, request);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
+		[HttpPut("update-email")]
+		public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmailRequest request)
+		{
+			var result = await _accountService.UpdateEmailAsync(_currentUser, request);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
+		[HttpPut("update-avatar")]
+		public async Task<IActionResult> UpdateAvatar([FromForm] UpdateAvatarRequest request)
+		{
+			var result = await _accountService.UpdateAvatarAsync(_currentUser, request);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}
