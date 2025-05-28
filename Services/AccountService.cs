@@ -5,9 +5,11 @@ using Collectors_Corner_Backend.Models.DTOs.Account;
 using Collectors_Corner_Backend.Models.DTOs.Auth;
 using Collectors_Corner_Backend.Models.DTOs.Collection;
 using Collectors_Corner_Backend.Models.Entities;
+using Collectors_Corner_Backend.Models.JSON;
 using ImageHosting.Extensions.Mappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
 
 namespace Collectors_Corner_Backend.Services
 {
@@ -102,6 +104,53 @@ namespace Collectors_Corner_Backend.Services
 				r.NativeImageUrl = imageUploadResponse.NativeImageUrl;
 				r.ThumbnailImageUrl = imageUploadResponse.ThumbnailImageUrl;
 			});
+		}
+
+		public async Task<BaseResponse> AddCollectionToFavorite(ICurrentUserService currentUser, int CollectionId)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail<UpdateAvatarResponse>("Invalid user");
+
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
+			if (user == null)
+				return Fail<BaseResponse>("User not found");
+
+			var collection = await _context.Collections.FirstOrDefaultAsync(c => c.Id == CollectionId);
+			if (collection == null || !collection.IsPublic)
+				return Fail<BaseResponse>("Invalid collection");
+
+			var favoriteCollection = await _context.FavoriteCollections.FirstOrDefaultAsync(u => u.UserId == user.Id);
+			if (favoriteCollection == null)
+			{
+				var favoriteObject = new FavoriteCollectionObject() { Data = new List<int>() { CollectionId } };
+				var json = JsonSerializer.Serialize(favoriteObject);
+
+				var newFavoriteCollection = new FavoriteCollections()
+				{
+					UserId = user.Id,
+					CollectionsJson = json
+				};
+
+				await _context.FavoriteCollections.AddAsync(newFavoriteCollection);
+				await _context.SaveChangesAsync();
+
+				return Success<BaseResponse>();
+			}
+			else
+			{
+				var favoriteObject = JsonSerializer.Deserialize<FavoriteCollectionObject>(favoriteCollection.CollectionsJson);
+				if (favoriteObject == null)
+					throw new NotImplementedException("Empty json");
+
+				favoriteObject.Data?.Add(CollectionId);
+
+				var json = JsonSerializer.Serialize(favoriteObject);
+
+				favoriteCollection.CollectionsJson = json;
+				await _context.SaveChangesAsync();
+
+				return Success<BaseResponse>();
+			}
 		}
 	}
 }
