@@ -47,5 +47,12 @@ namespace Collectors_Corner_Backend.Controllers
 			var result = await _accountService.UpdateAvatarAsync(_currentUser, request);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
+
+		[HttpPost("add-favorite")]
+		public async Task<IActionResult> AddCollectionToFavorite([FromBody] int CollectionId)
+		{
+			var result = await _accountService.AddCollectionToFavorite(_currentUser, CollectionId);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
 	}
 }
