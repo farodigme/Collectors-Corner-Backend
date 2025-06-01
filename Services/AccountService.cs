@@ -109,7 +109,7 @@ namespace Collectors_Corner_Backend.Services
 		public async Task<BaseResponse> AddCollectionToFavorite(ICurrentUserService currentUser, int CollectionId)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
-				return Fail<UpdateAvatarResponse>("Invalid user");
+				return Fail<BaseResponse>("Invalid user");
 
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
 			if (user == null)
@@ -151,6 +151,27 @@ namespace Collectors_Corner_Backend.Services
 
 				return Success<BaseResponse>();
 			}
+		}
+
+		public async Task<GetCollectionsResponse> GetFavoriteCollections(ICurrentUserService currentUser)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail<GetCollectionsResponse>("Invalid user");
+
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
+			if (user == null)
+				return Fail<GetCollectionsResponse>("User not found");
+
+			var favoriteCollections = await _context.FavoriteCollections.FirstOrDefaultAsync(u => u.UserId == user.Id);
+			if (favoriteCollections == null)
+				return Fail<GetCollectionsResponse>("No favorite collections");
+
+			var favoriteObject = JsonSerializer.Deserialize<FavoriteCollectionObject>(favoriteCollections.CollectionsJson);
+			if (favoriteObject == null)
+				throw new NotImplementedException("Empty json");
+
+			
+
 		}
 	}
 }
