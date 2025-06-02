@@ -167,11 +167,18 @@ namespace Collectors_Corner_Backend.Services
 				return Fail<GetCollectionsResponse>("No favorite collections");
 
 			var favoriteObject = JsonSerializer.Deserialize<FavoriteCollectionObject>(favoriteCollections.CollectionsJson);
-			if (favoriteObject == null)
+			if (favoriteObject == null || favoriteObject?.Data == null)
 				throw new NotImplementedException("Empty json");
 
-			
+			var favoriteCollectionIds = favoriteObject.Data;
 
+			var collections = await _context.Collections
+				.Where(c => favoriteCollectionIds.Contains(c.Id))
+				.ToListAsync();
+
+			var collectionsDto = CollectionMapper.ToDtoList(collections);
+
+			return Success<GetCollectionsResponse>(r => r.Collections = collectionsDto);
 		}
 	}
 }
