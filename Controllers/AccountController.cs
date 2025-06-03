@@ -1,5 +1,6 @@
 ﻿using Collectors_Corner_Backend.Interfaces;
 using Collectors_Corner_Backend.Models.DTOs.Account;
+using Collectors_Corner_Backend.Models.DTOs.Collection;
 using Collectors_Corner_Backend.Models.Entities;
 using Collectors_Corner_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +53,13 @@ namespace Collectors_Corner_Backend.Controllers
 		public async Task<IActionResult> AddCollectionToFavorite([FromBody] int CollectionId)
 		{
 			var result = await _accountService.AddCollectionToFavorite(_currentUser, CollectionId);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
+		[HttpGet("get-favorite-colelctions")]
+		public async Task<IActionResult> GetFavoriteCollections()
+		{
+			var result = await _accountService.GetFavoriteCollections(_currentUser);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}

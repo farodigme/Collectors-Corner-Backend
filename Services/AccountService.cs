@@ -168,7 +168,7 @@ namespace Collectors_Corner_Backend.Services
 
 			var favoriteObject = JsonSerializer.Deserialize<FavoriteCollectionObject>(favoriteCollections.CollectionsJson);
 			if (favoriteObject == null || favoriteObject?.Data == null)
-				throw new NotImplementedException("Empty json");
+				return Fail<GetCollectionsResponse>("Invalid json");
 
 			var favoriteCollectionIds = favoriteObject.Data;
 
