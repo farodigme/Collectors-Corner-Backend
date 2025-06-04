@@ -106,7 +106,7 @@ namespace Collectors_Corner_Backend.Services
 			});
 		}
 
-		public async Task<BaseResponse> AddCollectionToFavorite(ICurrentUserService currentUser, int CollectionId)
+		public async Task<BaseResponse> AddCollectionToFavorite(ICurrentUserService currentUser, int collectionId)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
 				return Fail<BaseResponse>("Invalid user");
@@ -115,14 +115,14 @@ namespace Collectors_Corner_Backend.Services
 			if (user == null)
 				return Fail<BaseResponse>("User not found");
 
-			var collection = await _context.Collections.FirstOrDefaultAsync(c => c.Id == CollectionId);
+			var collection = await _context.Collections.FirstOrDefaultAsync(c => c.Id == collectionId);
 			if (collection == null || !collection.IsPublic)
 				return Fail<BaseResponse>("Invalid collection");
 
 			var favoriteCollection = await _context.FavoriteCollections.FirstOrDefaultAsync(u => u.UserId == user.Id);
 			if (favoriteCollection == null)
 			{
-				var favoriteObject = new FavoriteCollectionObject() { Data = new List<int>() { CollectionId } };
+				var favoriteObject = new FavoriteCollectionObject() { Data = new List<int>() { collectionId } };
 				var json = JsonSerializer.Serialize(favoriteObject);
 
 				var newFavoriteCollection = new FavoriteCollections()
@@ -142,7 +142,7 @@ namespace Collectors_Corner_Backend.Services
 				if (favoriteObject == null)
 					throw new NotImplementedException("Empty json");
 
-				favoriteObject.Data?.Add(CollectionId);
+				favoriteObject.Data?.Add(collectionId);
 
 				var json = JsonSerializer.Serialize(favoriteObject);
 
@@ -179,6 +179,37 @@ namespace Collectors_Corner_Backend.Services
 			var collectionsDto = CollectionMapper.ToDtoList(collections);
 
 			return Success<GetCollectionsResponse>(r => r.Collections = collectionsDto);
+		}
+
+		public async Task<BaseResponse> DeleteFavoriteCollection(ICurrentUserService currentUser ,int collectionId)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail<BaseResponse>("Invalid user");
+
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
+			if (user == null)
+				return Fail<BaseResponse>("User not found");
+
+			var favoriteCollections = await _context.FavoriteCollections.FirstOrDefaultAsync(u => u.UserId == user.Id);
+			if (favoriteCollections == null)
+				return Fail<BaseResponse>("No favorite collections");
+
+			var favoriteObject = JsonSerializer.Deserialize<FavoriteCollectionObject>(favoriteCollections.CollectionsJson);
+			if (favoriteObject == null || favoriteObject?.Data == null)
+				return Fail<BaseResponse>("Invalid json");
+
+			var id = favoriteObject.Data.Where(item => item == collectionId).FirstOrDefault();
+			if (id <= 0)
+				return Fail<BaseResponse>("No such id");
+
+			favoriteObject.Data.Remove(id);
+
+			var json = JsonSerializer.Serialize(favoriteObject);
+
+			favoriteCollections.CollectionsJson = json;
+			await _context.SaveChangesAsync();
+
+			return Success<BaseResponse>();
 		}
 	}
 }
