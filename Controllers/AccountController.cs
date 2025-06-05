@@ -49,7 +49,7 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
-		[HttpPost("add-favorite")]
+		[HttpPost("add-favorite-collection")]
 		public async Task<IActionResult> AddCollectionToFavorite([FromBody] int CollectionId)
 		{
 			var result = await _accountService.AddCollectionToFavorite(_currentUser, CollectionId);
@@ -60,6 +60,13 @@ namespace Collectors_Corner_Backend.Controllers
 		public async Task<IActionResult> GetFavoriteCollections()
 		{
 			var result = await _accountService.GetFavoriteCollections(_currentUser);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
+		[HttpDelete("delete-favorite-colelctions")]
+		public async Task<IActionResult> DeleteFavoriteCollection([FromBody] int collectionId)
+		{
+			var result = await _accountService.DeleteFavoriteCollection(_currentUser, collectionId);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}
