@@ -191,14 +191,17 @@ namespace Collectors_Corner_Backend.Services
 				return Fail<BaseResponse>("User not found");
 
 			var favoriteCollections = await _context.FavoriteCollections.FirstOrDefaultAsync(u => u.UserId == user.Id);
+
 			if (favoriteCollections == null)
 				return Fail<BaseResponse>("No favorite collections");
 
 			var favoriteObject = JsonSerializer.Deserialize<FavoriteCollectionObject>(favoriteCollections.CollectionsJson);
+
 			if (favoriteObject == null || favoriteObject?.Data == null)
 				return Fail<BaseResponse>("Invalid json");
 
 			var id = favoriteObject.Data.Where(item => item == collectionId).FirstOrDefault();
+
 			if (id <= 0)
 				return Fail<BaseResponse>("No such id");
 
@@ -208,6 +211,30 @@ namespace Collectors_Corner_Backend.Services
 
 			favoriteCollections.CollectionsJson = json;
 			await _context.SaveChangesAsync();
+
+			return Success<BaseResponse>();
+		}
+
+		public async Task<BaseResponse> DeleteFavoriteCollections(ICurrentUserService currentUser, IEnumerable<int> collectionIds)
+		{
+			if (string.IsNullOrWhiteSpace(currentUser.Username))
+				return Fail<BaseResponse>("Invalid user");
+
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUser.Username);
+
+			if (user == null)
+				return Fail<BaseResponse>("User not found");
+
+			var favoriteCollections = await _context.FavoriteCollections.FirstOrDefaultAsync(u => u.UserId == user.Id);
+			if (favoriteCollections == null)
+				return Fail<BaseResponse>("No favorite collections");
+
+			var favoriteObject = JsonSerializer.Deserialize<FavoriteCollectionObject>(favoriteCollections.CollectionsJson);
+
+			if (favoriteObject == null || favoriteObject?.Data == null)
+				return Fail<BaseResponse>("Invalid json");
+
+			// do later
 
 			return Success<BaseResponse>();
 		}
