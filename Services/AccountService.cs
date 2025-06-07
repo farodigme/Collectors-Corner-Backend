@@ -234,7 +234,12 @@ namespace Collectors_Corner_Backend.Services
 			if (favoriteObject == null || favoriteObject?.Data == null)
 				return Fail<BaseResponse>("Invalid json");
 
-			// do later
+			favoriteObject.Data.RemoveAll(id => collectionIds.Contains(id));
+
+			var json = JsonSerializer.Serialize(favoriteObject);
+
+			favoriteCollections.CollectionsJson = json;
+			await _context.SaveChangesAsync();
 
 			return Success<BaseResponse>();
 		}
