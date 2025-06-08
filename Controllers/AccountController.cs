@@ -63,10 +63,17 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
-		[HttpDelete("delete-favorite-colelctions")]
+		[HttpDelete("delete-favorite-collection")]
 		public async Task<IActionResult> DeleteFavoriteCollection([FromBody] int collectionId)
 		{
 			var result = await _accountService.DeleteFavoriteCollection(_currentUser, collectionId);
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
+		[HttpDelete("delete-favorite-collections")]
+		public async Task<IActionResult> DeleteFavoriteCollection([FromBody] IEnumerable<int> collectionIds)
+		{
+			var result = await _accountService.DeleteFavoriteCollections(_currentUser, collectionIds);
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}
