@@ -14,6 +14,6 @@ namespace Collectors_Corner_Backend.Models.Entities
         public DbSet<Card> Cards { get; set; }
 		public DbSet<CardCategory> CardCategories { get; set; }
 		public DbSet<FavoriteCollections> FavoriteCollections { get; set; }
-
+		public DbSet<Rating> Ratings { get; set; }
 	}
 }
