@@ -71,7 +71,7 @@ namespace Collectors_Corner_Backend.Controllers
 		}
 
 		[HttpDelete("delete-favorite-collections")]
-		public async Task<IActionResult> DeleteFavoriteCollection([FromBody] IEnumerable<int> collectionIds)
+		public async Task<IActionResult> DeleteFavoriteCollections([FromBody] IEnumerable<int> collectionIds)
 		{
 			var result = await _accountService.DeleteFavoriteCollections(_currentUser, collectionIds);
 			return result.Success ? Ok(result) : BadRequest(result);
