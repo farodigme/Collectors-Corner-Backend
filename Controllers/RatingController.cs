@@ -1,4 +1,5 @@
 ﻿using Collectors_Corner_Backend.Interfaces;
+using Collectors_Corner_Backend.Models.DTOs.Rating;
 using Collectors_Corner_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,12 @@ namespace Collectors_Corner_Backend.Controllers
 			_currentUser = currentUserService;
 			_ratingService = ratingService;
 		}
-		public async Task<IActionResult> GetCollectionRating() 
+
+		[HttpPost("update-collection-rating")]
+		public async Task<IActionResult> UpdateCollectionRating([FromBody] UpdateCollectionRatingRequest request) 
 		{
-			throw new NotImplementedException();
+			var result = await _ratingService.UpdateCollectionRating(_currentUser, request);
+			return result.Success ? Ok(result) : BadRequest(result);
 		}
 	}
 }
