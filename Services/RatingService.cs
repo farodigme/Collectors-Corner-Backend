@@ -43,12 +43,12 @@ namespace Collectors_Corner_Backend.Services
 				{
 					CollectionId = request.CollectionId,
 					UserId = user.Id,
-					StarCount = request.RatingValue
+					RatingValue = request.RatingValue
 				};
 			}
 			else
 			{
-				currentRating.StarCount = request.RatingValue;
+				currentRating.RatingValue = request.RatingValue;
 			}
 
 			await _context.SaveChangesAsync();
