@@ -85,6 +85,20 @@ namespace Collectors_Corner_Backend.Services
 			return Success<GetCollectionsResponse>(r => r.Collections = collectionsDto);
 		}
 
+		public async Task<GetCollectionsResponse> GetPopularCollectionsAsync()
+		{
+			var collections = await _context.Collections
+				.AsNoTracking()
+				.Include(c => c.Category)
+				.Where(c => c.IsPublic)
+				.OrderByDescending(c => c.Views)
+				.ToListAsync();
+
+			var collectionsDto = CollectionMapper.ToDtoList(collections);
+
+			return Success<GetCollectionsResponse>(r => r.Collections = collectionsDto);
+		}
+
 		public async Task<UpdateCollectionResponse> UpdateUserCollectionAsync(ICurrentUserService currentUser, UpdateCollectionRequest request)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))

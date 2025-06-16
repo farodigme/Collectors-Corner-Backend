@@ -33,6 +33,13 @@ namespace Collectors_Corner_Backend.Controllers
 			return result.Success ? Ok(result) : BadRequest(result);
 		}
 
+		[HttpGet("popular")]
+		public async Task<IActionResult> GetPopularCollections()
+		{
+			var result = await _collectionService.GetPopularCollectionsAsync();
+			return result.Success ? Ok(result) : BadRequest(result);
+		}
+
 		[HttpPut("update")]
 		public async Task<IActionResult> UpdateCollection([FromForm] UpdateCollectionRequest request)
 		{
