@@ -13,7 +13,7 @@ namespace ImageHosting.Extensions.Mappers
 			Category = collections.Category.Title,
 			ImageUrl = collections.ImageUrl,
 			IsPublic = collections.IsPublic,
-			Rating = collections.Rating
+			Rating = collections.Rating,
 		};
 		public static List<CollectionDto> ToDtoList(IEnumerable<Collection> collections)
 		{

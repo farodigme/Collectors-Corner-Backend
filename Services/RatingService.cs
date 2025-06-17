@@ -35,7 +35,16 @@ namespace Collectors_Corner_Backend.Services
 			if (user is null)
 				return Fail<BaseResponse>("No such user");
 
-			var currentRating = await _context.Ratings.Include(u => u.UserId == user.Id).FirstOrDefaultAsync(r => r.CollectionId == request.CollectionId);
+			var collection = await _context.Collections
+				.Include(u => u.UserId == user.Id)
+				.FirstOrDefaultAsync(r => r.Id == request.CollectionId);
+
+			if (collection is null) 
+				return Fail<BaseResponse>("No such collection");
+
+			var currentRating = await _context.Ratings
+				.Include(u => u.UserId == user.Id)
+				.FirstOrDefaultAsync(r => r.CollectionId == request.CollectionId);
 
 			if (currentRating is null)
 			{
@@ -45,9 +54,19 @@ namespace Collectors_Corner_Backend.Services
 					UserId = user.Id,
 					RatingValue = request.RatingValue
 				};
+
+				await _context.Ratings.AddAsync(newRating);
+				collection.Rating = request.RatingValue;
 			}
 			else
 			{
+				decimal averageRatingByCollection = await _context.Ratings
+					.Where(c => c.CollectionId == request.CollectionId)
+					.AverageAsync(r => r.RatingValue);
+
+				decimal newRating = (averageRatingByCollection + request.RatingValue) / 2;
+
+				collection.Rating = newRating;
 				currentRating.RatingValue = request.RatingValue;
 			}
 
