@@ -12,6 +12,7 @@
 		public string? ImageUrl { get; set; }
 		public bool IsPublic { get; set; }
 		public decimal Rating { get; set; }
+		public string? Tags { get; set; }
 		public int Views {  get; set; }
 	}
 }

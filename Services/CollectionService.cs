@@ -152,7 +152,6 @@ namespace Collectors_Corner_Backend.Services
 			});
 		}
 
-
 		public async Task<BaseResponse> DeleteCollectionAsync(ICurrentUserService currentUser, int collectionId)
 		{
 			if (string.IsNullOrWhiteSpace(currentUser.Username))
