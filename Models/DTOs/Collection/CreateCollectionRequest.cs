@@ -22,5 +22,7 @@ namespace Collectors_Corner_Backend.Models.DTOs.Collection
 
 		[Required]
 		public IFormFile Image { get; set; }
+
+		public List<string>? Tags { get; set; }
 	}
 }

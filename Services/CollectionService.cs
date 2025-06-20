@@ -54,6 +54,16 @@ namespace Collectors_Corner_Backend.Services
 				IsPublic = request.IsPublic
 			};
 
+			if (request.Tags != null)
+			{
+				var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Name)).ToListAsync();
+				
+				if (tags.Count == request.Tags.Count)
+					newCollection.Tags = tags;
+				else 
+					return Fail<CreateCollectionResponse>("Invalid tags");
+			}
+
 			await _context.Collections.AddAsync(newCollection);
 			await _context.SaveChangesAsync();
 
