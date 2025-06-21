@@ -148,6 +148,16 @@ namespace Collectors_Corner_Backend.Services
 				thumbUrl = imageUploadResponse.ThumbnailImageUrl;
 			}
 
+			if (request.Tags != null)
+			{
+				var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Name)).ToListAsync();
+
+				if (tags.Count == request.Tags.Count)
+					collection.Tags = tags;
+				else
+					return Fail<UpdateCollectionResponse>("Invalid tags");
+			}
+
 			await _context.SaveChangesAsync();
 
 			return Success<UpdateCollectionResponse>(r =>
