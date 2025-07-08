@@ -11,6 +11,8 @@
 		public CollectionCategory Category { get; set; }
 		public string? ImageUrl { get; set; }
 		public bool IsPublic { get; set; }
+		public decimal Rating { get; set; }
+		public List<Tag>? Tags { get; set; }
 		public int Views {  get; set; }
 	}
 }

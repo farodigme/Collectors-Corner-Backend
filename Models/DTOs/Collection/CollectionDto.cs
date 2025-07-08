@@ -11,5 +11,6 @@ namespace Collectors_Corner_Backend.Models.DTOs.Collection
 		public string? ImageUrl { get; set; }
 		public bool IsPublic { get; set; }
 		public decimal Rating { get; set; }
+		public List<string>? Tags { get; set; }
 	}
 }

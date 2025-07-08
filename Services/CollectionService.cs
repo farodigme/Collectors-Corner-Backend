@@ -54,6 +54,16 @@ namespace Collectors_Corner_Backend.Services
 				IsPublic = request.IsPublic
 			};
 
+			if (request.Tags != null)
+			{
+				var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Name)).ToListAsync();
+				
+				if (tags.Count == request.Tags.Count)
+					newCollection.Tags = tags;
+				else 
+					return Fail<CreateCollectionResponse>("Invalid tags");
+			}
+
 			await _context.Collections.AddAsync(newCollection);
 			await _context.SaveChangesAsync();
 
@@ -138,6 +148,16 @@ namespace Collectors_Corner_Backend.Services
 				thumbUrl = imageUploadResponse.ThumbnailImageUrl;
 			}
 
+			if (request.Tags != null)
+			{
+				var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Name)).ToListAsync();
+
+				if (tags.Count == request.Tags.Count)
+					collection.Tags = tags;
+				else
+					return Fail<UpdateCollectionResponse>("Invalid tags");
+			}
+
 			await _context.SaveChangesAsync();
 
 			return Success<UpdateCollectionResponse>(r =>
@@ -151,7 +171,6 @@ namespace Collectors_Corner_Backend.Services
 				r.ThumbnailImageUrl = thumbUrl;
 			});
 		}
-
 
 		public async Task<BaseResponse> DeleteCollectionAsync(ICurrentUserService currentUser, int collectionId)
 		{

@@ -21,5 +21,6 @@ namespace Collectors_Corner_Backend.Models.DTOs.Collection
 		[Required]
 		public bool IsPublic { get; set; }
 		public IFormFile? Image { get; set; }
+		public List<string>? Tags { get; set; }
 	}
 }
