@@ -13,6 +13,7 @@ namespace Collectors_Corner_Backend.Extensions.Mappers
 				Success = true,
 				Username = user.Username,
 				Nickname = user.Nickname,
+				AvatarUrl = user.AvatarUrl,
 				Email = user.Email,
 				Created = user.CreatedAt,
 				Collections = CollectionMapper.ToDtoList(collections)
